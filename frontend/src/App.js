@@ -1,12 +1,11 @@
-import { Fragment } from 'react';
 import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import Login from './Pages/Login';
 
 function App() {
   return (
-    <Fragment>
-      <h1 className='text-danger'>Hello World</h1>
-    </Fragment>
+   <>
+   <Login/>
+   </>
   )
 }
 
