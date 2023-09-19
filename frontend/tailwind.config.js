@@ -7,12 +7,12 @@ module.exports = {
     extend: {
       keyframes: {
         bornkey: {
-          '0%': { transform: 'scale(.5)' },
+          '0%': { transform: 'scale(.9)' },
           '100%': { transform: 'scale(1)' },
         }
       },
       animation: {
-        'born': 'bornkey 1.5s ease 1',
+        'born': 'bornkey 1s ease 1',
       }
     },
   },
