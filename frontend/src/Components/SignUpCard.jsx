@@ -4,12 +4,19 @@ import Button from "./Button"
 const SignUpCard = ({setLogin}) => {
     const [pShow, setPShow] = useState(false);
     const [details, setDetails] = useState({name: "", email: "", password: "", rePass: ""});
+    const handleLogin = () => {
+        const main = document.getElementById('main');
+        main.classList.add('animate-death');
+        setTimeout(() => {
+            setLogin(true)
+        }, 900);
+    }
     const handleClick = () => {
 
     }
-  return (
+  return ( 
     <>
-    <div className='xl:w-2/4 md:w-3/4 w-3/4 sm:w-2/4 px-10 h-fit  shadow-2xl rounded-xl bg-gray-100 overflow-auto py-5 animate-born'>
+    <div id="main" className='xl:w-2/4 md:w-3/4 w-3/4 sm:w-2/4 px-10 h-fit  shadow-2xl rounded-xl bg-gray-100 overflow-auto py-5 animate-born'>
                 <div className="mt-6">
                     <h1 className="text-3xl font-semibold text-slate-700">Welcome to <span className="font-bold italic"><span className="text-orange-500 text-4xl font-serif">S</span>tyle<span className="text-orange-500 text-4xl font-serif">Z</span>one</span></h1>
                     <p className="mt-3 text-xl text-slate-600 font-medium"> One step closer to fashion bliss. Register and shop with style.</p>
@@ -43,7 +50,7 @@ const SignUpCard = ({setLogin}) => {
                         </div>
                         <Button label='Sign Up' handleClick={handleClick}/>
                         <div className="text-center">
-                            <span className="text-gray-600 text-sm font-medium">Already have an account? </span><span className="text-orange-500 italic font-medium text-sm cursor-pointer" onClick={() => setLogin(true)}>Log In</span>
+                            <span className="text-gray-600 text-sm font-medium">Already have an account? </span><span className="text-orange-500 italic font-medium text-sm cursor-pointer" onClick={handleLogin}>Log In</span>
                         </div>
                     </div>
                 </div>

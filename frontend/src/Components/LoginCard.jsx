@@ -1,28 +1,32 @@
 import { useRef, useState } from "react"
 import Button from "./Button"
-import swal from 'sweetalert2'
+import AlertModal from "./AlertModal";
+// import swal from 'sweetalert2'
 
 const LoginCard = ({ setLogin }) => {
     const [details, setDetails] = useState({ email: "", password: "" });
     const [pShow, setPShow] = useState(false);
+    const [open, setOpen] = useState(false)
     const emailRef = useRef();
     const passRef = useRef();
+    const handleSignup = () => {
+        const main = document.getElementById('main');
+        main.classList.add('animate-death');
+        setTimeout(() => {
+            setLogin(false)
+        }, 900);
+
+    }
     const handleClick = () => {
-        if (details.email && details.password) {
+        if (details.email && details.password) { 
             setDetails({ email: "", password: "" })
         } else {
-            if (!details.email && !details.password) {
-                swal.fire('Please input anything !')
-            }else if (!details.email) {
-                emailRef.current.focus();
-            }else if (!details.password) {
-                passRef.current.focus();
-            }
+            setOpen(true)
         }
     }
     return (
         <>
-            <div className='xl:w-2/4 md:w-3/4 w-3/4 sm:w-2/4 px-10 h-fit  shadow-2xl rounded-xl bg-gray-100 overflow-auto py-5 animate-born'>
+            <div id="main" className='xl:w-2/4 md:w-3/4 w-3/4 sm:w-2/4 px-10 h-fit  shadow-2xl rounded-xl bg-gray-100 overflow-auto py-5 animate-born'>
                 <div className="mt-6">
                     <h1 className="text-3xl font-semibold text-slate-700">Login to <span className="font-bold italic"><span className="text-orange-500 text-4xl font-serif">S</span>tyle<span className="text-orange-500 text-4xl font-serif">Z</span>one</span></h1>
                     <p className="mt-3 text-xl text-slate-600 font-medium"> <span className="font-serif font-semibold">Discover</span>, <span className="font-serif font-semibold">shop</span>, <span className="font-serif font-semibold">repeat</span>. Login for the ultimate fashion experience.</p>
@@ -49,11 +53,24 @@ const LoginCard = ({ setLogin }) => {
                         </div>
                         <Button label='Log In' handleClick={handleClick} />
                         <div className="text-center">
-                            <span className="text-gray-600 text-sm font-medium">Don't have an account? </span><span className="text-orange-500 italic font-medium text-sm cursor-pointer" onClick={() => setLogin(false)}>Create One</span>
+                            <span className="text-gray-600 text-sm font-medium">Don't have an account? </span><span className="text-orange-500 italic font-medium text-sm cursor-pointer" onClick={handleSignup}>Create One</span>
                         </div>
                     </div>
                 </div>
             </div>
+            <AlertModal open={open} onClose={() => setOpen(false)}>
+                <div className="text-center w-53">
+                    <div className="flex justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12  text-red-500">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                        </svg>
+                    </div>
+                    <h2 className="font-mono font-medium my-3" >Inputs cannot be empty !</h2>
+                    <div className="text-center mt-1 " onClick={() => setOpen(false)}>
+                        <button className="border px-2 py-1 bg-orange-500 text-white rounded-md hover:bg-white hover:text-orange-500 hover:border-orange-500 transition-all  ">Ok</button>
+                    </div>
+                </div>
+            </AlertModal>
         </>
     )
 }

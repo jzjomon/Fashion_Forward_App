@@ -5,7 +5,7 @@ import SignUpCard from '../Components/SignUpCard.jsx';
 
 const Login = () => {
     const [login, setLogin] = useState(true);
-    return (
+    return ( 
         <>
             <section>
                 <div className='w-full h-screen overflow-hidden md:flex bg-slate-200'>
@@ -20,5 +20,5 @@ const Login = () => {
         </>
     )
 }
-
-export default Login
+ 
+export default Login 
