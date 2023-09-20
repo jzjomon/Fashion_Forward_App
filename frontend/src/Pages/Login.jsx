@@ -9,7 +9,7 @@ const Login = () => {
         <>
             <section>
                 <div className='w-full h-screen overflow-hidden md:flex bg-slate-200'>
-                    <div className="md:w-1/2 h-full flex justify-center items-center">
+                    <div className="md:w-1/2 h-full overflow-auto flex justify-center items-center">
                        {login ? <LoginCard setLogin={setLogin}/> : <SignUpCard setLogin={setLogin}/>}
                     </div>
                     <div className="w-1/2 h-full shadow-2xl md:block hidden">
