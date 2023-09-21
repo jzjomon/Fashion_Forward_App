@@ -5,7 +5,7 @@ import axios from 'axios';
 // import swal from 'sweetalert2'
 
 const LoginCard = ({ setLogin }) => {
-    const [alertMessage, setAlertMessage] = useState('');
+    const [alertMessage, setAlertMessage] = useState('Inputs cannot be empty !');
     const [details, setDetails] = useState({ email: "", password: "" });
     const [pShow, setPShow] = useState(false);
     const [open, setOpen] = useState(false)
@@ -24,10 +24,10 @@ const LoginCard = ({ setLogin }) => {
             axios.post('http://localhost:8080/login', details).then((res) => {
                 console.log(res);
             }).catch((err => {
-                if (err.response.data.exist) {
+                if (err?.response?.data?.exist) {
                     setAlertMessage('Invalid email !')
                     setOpen(true);
-                } else if (err.response.data.password) {
+                } else if (err?.response?.data?.password) {
                     setAlertMessage('invalid password !');
                     setOpen(true);
                 } else {

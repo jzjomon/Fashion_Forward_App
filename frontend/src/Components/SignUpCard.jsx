@@ -10,7 +10,7 @@ const SignUpCard = ({ setLogin }) => {
     const [emailAlert, setEmailAlert] = useState(false);
     const [passAlert, setPassAlert] = useState(false);
     const [rePassAlert, setRePassAlert] = useState(false);
-    const [alertMessage, setAlertMessage] = useState()
+    const [alertMessage, setAlertMessage] = useState('Inputs cannot be empty !')
     const [open, setOpen] = useState(false)
     const [pShow, setPShow] = useState(false);
     const [rePass, setRePass] = useState("");
@@ -58,7 +58,7 @@ const SignUpCard = ({ setLogin }) => {
                  axios.post('http://localhost:8080/signup',details).then(res => {
                         setLogin(true)
                  }).catch(err => {
-                  if(err.response.data.exist){
+                  if(err?.response?.data?.exist){
                      setAlertMessage('Email already exists !');
                      setOpen(true)
                   }else{
@@ -89,7 +89,7 @@ const SignUpCard = ({ setLogin }) => {
                             <label htmlFor="" className="text-gray-600 font-medium" >Last name
                                 {lnameAlert && <span className="text-red-600 ps-5  animate-blink">Invalid lastname !</span>}
                             </label>
-                            <input type="text" value={details.lastname} placeholder="Enter your lastname" onChange={(e) => setDetails({ ...details, lastname: e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1) })} className="shadow-2xl px-1 py-3 rounded-md" />
+                            <input type="text" value={details.lastname} placeholder="Enter your lastname" onChange={(e) => setDetails({ ...details, lastname: e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1)})} className="shadow-2xl px-1 py-3 rounded-md" />
                         </div>
                         <div id="email" className="flex flex-col gap-2">
                             <label htmlFor="" className="text-gray-600 font-medium" >Email
