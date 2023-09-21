@@ -1,0 +1,51 @@
+const USER = require('../models/userModal');
+const bcrypt = require('bcrypt');
+
+const signUp = (req, res) => {
+    try {
+        bcrypt.hash(req.body.password, 10, (err, hash) => {
+            if (err) {
+                res.status(500).json({ error: true });
+            } else {
+                USER.findOne({ email: req.body.email }).then((result) => {
+                    if (result) {
+                        res.status(500).json({ exist: true })
+                    } else {
+                        USER({ firstname: req.body.firstname, lastname: req.body.lastname, email: req.body.email, password: hash }).save().then((result) => {
+                            res.status(200).json({ success: true });
+                        }).catch((err) => {
+                            res.status(500).json({ error: true })
+                        });
+                    }
+                }).catch((err) => {
+                    res.status(500).json({ error: true })
+                });
+            }
+        })
+    }
+    catch (err) {
+        res.status(500).json({ error: true })
+    }
+}
+
+const login = (req, res) => {
+    try {
+        USER.findOne({ email: req.body.email }).then(data => {
+            bcrypt.compare(req.body.password, data.password, (err, result) => {
+                if (result) {
+                    res.status(200).json({ token: data._id });
+                } else {
+                    res.status(500).json({ password: true });
+                }
+            })
+        }).catch(err => {
+            res.status(500).json({ exist: true })
+        })
+    }
+    catch (err) {
+        res.status(500).json({ error: true });
+    }
+}
+
+ 
+module.exports = { signUp, login }

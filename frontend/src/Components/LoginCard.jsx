@@ -1,9 +1,11 @@
 import { useRef, useState } from "react"
 import Button from "./Button"
 import AlertModal from "./AlertModal";
+import axios from 'axios';
 // import swal from 'sweetalert2'
 
 const LoginCard = ({ setLogin }) => {
+    const [alertMessage, setAlertMessage] = useState('');
     const [details, setDetails] = useState({ email: "", password: "" });
     const [pShow, setPShow] = useState(false);
     const [open, setOpen] = useState(false)
@@ -18,9 +20,23 @@ const LoginCard = ({ setLogin }) => {
 
     }
     const handleClick = () => {
-        if (details.email && details.password) { 
-            setDetails({ email: "", password: "" })
+        if (details.email && details.password) {
+            axios.post('http://localhost:8080/login', details).then((res) => {
+                console.log(res);
+            }).catch((err => {
+                if (err.response.data.exist) {
+                    setAlertMessage('Invalid email !')
+                    setOpen(true);
+                } else if (err.response.data.password) {
+                    setAlertMessage('invalid password !');
+                    setOpen(true);
+                } else {
+                    setAlertMessage('Something went wrong !');
+                    setOpen(true);
+                }
+            }))
         } else {
+            setAlertMessage('Inputs cannot be empty !');
             setOpen(true)
         }
     }
@@ -65,7 +81,7 @@ const LoginCard = ({ setLogin }) => {
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                         </svg>
                     </div>
-                    <h2 className="font-mono font-medium my-3" >Inputs cannot be empty !</h2>
+                    <h2 className="font-mono font-medium my-3" >{alertMessage}</h2>
                     <div className="text-center mt-1 " onClick={() => setOpen(false)}>
                         <button className="border px-2 py-1 bg-orange-500 text-white rounded-md hover:bg-white hover:text-orange-500 hover:border-orange-500 transition-all  ">Ok</button>
                     </div>

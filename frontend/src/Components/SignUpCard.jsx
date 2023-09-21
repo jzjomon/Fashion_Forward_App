@@ -2,6 +2,7 @@ import { useState } from "react"
 import Button from "./Button"
 import { validateEmail, validateName, validatePass } from "../Constants/Rejex";
 import AlertModal from "./AlertModal";
+import axios from 'axios';
 
 const SignUpCard = ({ setLogin }) => {
     const [fnameAlert, setFnameAlert] = useState(false);
@@ -9,6 +10,7 @@ const SignUpCard = ({ setLogin }) => {
     const [emailAlert, setEmailAlert] = useState(false);
     const [passAlert, setPassAlert] = useState(false);
     const [rePassAlert, setRePassAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState()
     const [open, setOpen] = useState(false)
     const [pShow, setPShow] = useState(false);
     const [rePass, setRePass] = useState("");
@@ -22,8 +24,10 @@ const SignUpCard = ({ setLogin }) => {
     }
     const handleClick = () => {
         if (!details.firstname && !details.lastname && !details.email && !details.password) {
+            setAlertMessage('Inputs cannot be empty !')
             setOpen(true);
-            return false
+        }else  if(!details.firstname || !details.lastname || !details.email || !details.password){
+            setOpen(true);
         } else {
             if (!validateName.test(details.firstname)) {
                 setFnameAlert(true);
@@ -51,7 +55,17 @@ const SignUpCard = ({ setLogin }) => {
                     setRePassAlert(false)
                 }, 3000);
             } else {
-                 
+                 axios.post('http://localhost:8080/signup',details).then(res => {
+                        setLogin(true)
+                 }).catch(err => {
+                  if(err.response.data.exist){
+                     setAlertMessage('Email already exists !');
+                     setOpen(true)
+                  }else{
+                    setAlertMessage('Something went wrong !');
+                    setOpen(true)
+                  }
+                 })
             }
         }
     }
@@ -118,12 +132,13 @@ const SignUpCard = ({ setLogin }) => {
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                         </svg>
                     </div>
-                    <h2 className="font-mono font-medium my-3" >Inputs cannot be empty !</h2>
+                    <h2 className="font-mono font-medium my-3" >{alertMessage}</h2>
                     <div className="text-center mt-1 " onClick={() => setOpen(false)}>
                         <button className="border px-2 py-1 bg-orange-500 text-white rounded-md hover:bg-white hover:text-orange-500 hover:border-orange-500 transition-all  ">Ok</button>
                     </div>
                 </div>
             </AlertModal>
+            
         </>
     )
 }
