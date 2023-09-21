@@ -1,5 +1,6 @@
 const USER = require('../models/userModal');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const signUp = (req, res) => {
     try {
@@ -28,12 +29,15 @@ const signUp = (req, res) => {
     }
 }
 
-const login = (req, res) => {
+const login =  (req, res) => {
     try {
         USER.findOne({ email: req.body.email }).then(data => {
             bcrypt.compare(req.body.password, data.password, (err, result) => {
                 if (result) {
-                    res.status(200).json({ token: data._id });
+                    const token = jwt.sign({userid: data._id},process.env.TOKENPASS ,{
+                        expiresIn:"3d"
+                    });
+                    res.status(200).json({ token: token});
                 } else {
                     res.status(500).json({ password: true });
                 }

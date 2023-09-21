@@ -3,13 +3,15 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const cors = require('cors')
+const cors = require('cors');
+require('dotenv').config()
 
 var authRouter = require('./routes/auth');
 var usersRouter = require('./routes/users');
 const connectDataBase = require('./config/dbConfig');
 
 var app = express();
+
 
 app.use(cors())
 app.use(logger('dev'));
