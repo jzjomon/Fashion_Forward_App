@@ -2,9 +2,14 @@ import { useRef, useState } from "react"
 import Button from "./Button"
 import AlertModal from "./AlertModal";
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from "react-redux";
+import { setUserName } from "../toolkit/userNameSlice";
 // import swal from 'sweetalert2'
 
 const LoginCard = ({ setLogin }) => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [alertMessage, setAlertMessage] = useState('Inputs cannot be empty !');
     const [details, setDetails] = useState({ email: "", password: "" });
     const [pShow, setPShow] = useState(false);
@@ -20,25 +25,35 @@ const LoginCard = ({ setLogin }) => {
 
     }
     const handleClick = () => {
-        if (details.email && details.password) {
-            axios.post('http://localhost:8080/login', details).then((res) => {
-                console.log(res);
-            }).catch((err => {
-                if (err?.response?.data?.exist) {
-                    setAlertMessage('Invalid email !')
-                    setOpen(true);
-                } else if (err?.response?.data?.password) {
-                    setAlertMessage('invalid password !');
-                    setOpen(true);
-                } else {
-                    setAlertMessage('Something went wrong !');
-                    setOpen(true);
-                }
-            }))
-        } else {
-            setAlertMessage('Inputs cannot be empty !');
-            setOpen(true)
+        try {
+            if (details.email && details.password) {
+                axios.post('http://localhost:8080/login', details).then(({ data }) => {
+                    localStorage.setItem('token', data?.token)
+                    dispatch(setUserName({ firstname: data?.firstname, lastname: data?.lastname }))
+                    navigate('/home')
+                    
+                }).catch((({ response: { data } }) => {
+                    if (data?.exist) {
+                        setAlertMessage('Invalid email !')
+                        setOpen(true);
+                    } else if (data?.password) {
+                        setAlertMessage('invalid password !');
+                        setOpen(true);
+                    } else {
+                        setAlertMessage('Something went wrong !');
+                        setOpen(true);
+                    }
+                }))
+            } else {
+                setAlertMessage('Inputs cannot be empty !');
+                setOpen(true)
+            }
         }
+        catch (error) {
+            setAlertMessage('Something went wrong !');
+            setOpen(true);
+        }
+
     }
     return (
         <>
