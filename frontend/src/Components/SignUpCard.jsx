@@ -1,6 +1,6 @@
 import { useState } from "react"
 import Button from "./Button"
-import { validateEmail, validateName, validatePass } from "../Constants/Rejex";
+import { validateEmail, validateFirstName, validateLastName, validatePass } from "../Constants/Rejex";
 import AlertModal from "./AlertModal";
 import axios from 'axios';
 
@@ -29,12 +29,12 @@ const SignUpCard = ({ setLogin }) => {
         }else  if(!details.firstname || !details.lastname || !details.email || !details.password){
             setOpen(true);
         } else {
-            if (!validateName.test(details.firstname)) {
+            if (!validateFirstName.test(details.firstname)) {
                 setFnameAlert(true);
                 setTimeout(() => {
                     setFnameAlert(false)
                 }, 3000);
-            } else if (!validateName.test(details.lastname)) {
+            } else if (!validateLastName.test(details.lastname)) {
                 setLnameAlert(true);
                 setTimeout(() => {
                     setLnameAlert(false)
