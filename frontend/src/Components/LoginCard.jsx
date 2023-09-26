@@ -59,8 +59,8 @@ const LoginCard = ({ setLogin }) => {
         <>
             <div id="main" className='xl:w-2/4 md:w-3/4 w-3/4 sm:w-2/4 px-10 h-fit  shadow-2xl rounded-xl bg-gray-100 overflow-auto py-5 animate-born'>
                 <div className="mt-6">
-                    <h1 className="text-3xl font-semibold text-slate-700">Login to <span className="font-bold italic"><span className="text-orange-500 text-4xl font-serif">S</span>tyle<span className="text-orange-500 text-4xl font-serif">Z</span>one</span></h1>
-                    <p className="mt-3 text-xl text-slate-600 font-medium"> <span className="font-serif font-semibold">Discover</span>, <span className="font-serif font-semibold">shop</span>, <span className="font-serif font-semibold">repeat</span>. Login for the ultimate fashion experience.</p>
+                    <h1 className="text-3xl font-semibold text-slate-700">Login to <span className="font-bold italic"><span className="text-orange-500 text-4xl font-serif">T</span>urf<span className="text-orange-500 text-4xl font-serif">H</span>ouse</span></h1>
+                    <p className="mt-3 text-xl text-slate-600 font-medium">Where every game begins with a click. Welcome back!</p>
                 </div>
                 <div className="mt-9">
                     <div className="flex flex-col gap-8">

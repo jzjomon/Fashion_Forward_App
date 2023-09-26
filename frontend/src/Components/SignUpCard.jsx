@@ -74,8 +74,8 @@ const SignUpCard = ({ setLogin }) => {
         <>
             <div id="main" className='xl:w-2/4 md:w-3/4 w-3/4 sm:w-2/4 px-10 h-fit mt-auto mb-auto  shadow-2xl rounded-xl bg-gray-100 py-5 animate-born'>
                 <div className="mt-6">
-                    <h1 className="text-3xl font-semibold text-slate-700">Welcome to <span className="font-bold italic"><span className="text-orange-500 text-4xl font-serif">S</span>tyle<span className="text-orange-500 text-4xl font-serif">Z</span>one</span></h1>
-                    <p className="mt-3 text-xl text-slate-600 font-medium"> One step closer to fashion bliss. Register and shop with style.</p>
+                    <h1 className="text-3xl font-semibold text-slate-700">Welcome to <span className="font-bold italic"><span className="text-orange-500 text-4xl font-serif">T</span>urf<span className="text-orange-500 text-4xl font-serif">H</span>ouse</span></h1>
+                    <p className="mt-3 text-xl text-slate-600 font-medium">Get in the game! Sign up and secure your spot on the turf.</p>
                 </div>
                 <div className="mt-9">
                     <div className="flex flex-col transition-all gap-5">
