@@ -4,7 +4,7 @@ import AlertModal from "./AlertModal";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from "react-redux";
-import { setUserName } from "../toolkit/userNameSlice";
+import { setUserData } from "../toolkit/userNameSlice";
 // import swal from 'sweetalert2'
 
 const LoginCard = ({ setLogin }) => {
@@ -29,7 +29,7 @@ const LoginCard = ({ setLogin }) => {
             if (details.email && details.password) {
                 axios.post('http://localhost:8080/login', details).then(({ data }) => {
                     localStorage.setItem('token', data?.token)
-                    dispatch(setUserName({ firstname: data?.firstname, lastname: data?.lastname }))
+                    dispatch(setUserData({ userData : data }))
                     navigate('/home')
                     
                 }).catch((({ response: { data } }) => {

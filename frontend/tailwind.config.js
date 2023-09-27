@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+import withMT from '@material-tailwind/react/utils/withMT'
+module.exports = withMT({
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
@@ -17,7 +18,7 @@ module.exports = {
         },
         blinkkey: {
           '0%': {opacity : '1'},
-          '50%': {opacity : '0'},
+          '50%': {opacity : '0'}, 
           '100%': {opacity : '1'}
         }
         
@@ -30,4 +31,4 @@ module.exports = {
     },
   },
   plugins: [],
-}
+});
