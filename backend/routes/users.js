@@ -1,9 +1,9 @@
 var express = require('express');
+const { registerCourt } = require('../controllers/userControllers');
+const fileUpload = require('express-fileupload');
 var router = express.Router();
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+
+router.post('/register-court',fileUpload({createParentPath: true}),registerCourt)
 
 module.exports = router;

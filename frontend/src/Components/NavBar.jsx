@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import {
   Navbar,
@@ -23,44 +24,49 @@ import {
   // Cog6ToothIcon,
   // InboxArrowDownIcon,
   // LifebuoyIcon,
-  PowerIcon,
+  // PowerIcon,
   // RocketLaunchIcon,
   Bars2Icon,
   ChatBubbleLeftRightIcon,
   HomeIcon,
 } from "@heroicons/react/24/outline";
  
-// profile menu component
-const profileMenuItems = [
-  // {
-  //   label: "My Profile",
-  //   icon: UserCircleIcon,
-  // },
-  // {
-  //   label: "Edit Profile",
-  //   icon: Cog6ToothIcon,
-  // },
-  // {
-  //   label: "Inbox",
-  //   icon: InboxArrowDownIcon,
-  // },
-  // {
-  //   label: "Help",
-  //   icon: LifebuoyIcon,
-  // },
-  {
-    label: "Sign Out",
-    icon: PowerIcon,
-  },
-];
+// // profile menu component
+// const profileMenuItems = [
+//   // {
+//   //   label: "My Profile",
+//   //   icon: UserCircleIcon,
+//   // },
+//   // {
+//   //   label: "Edit Profile",
+//   //   icon: Cog6ToothIcon,
+//   // },
+//   // {
+//   //   label: "Inbox",
+//   //   icon: InboxArrowDownIcon,
+//   // },
+//   {
+//     label: "Sign Out",
+//     icon: PowerIcon,
+//   },
+// ];
  
+
+
 function ProfileMenu() {
-  
-  const { userData : {firstname, lastname}} = useSelector((state) => state.user);
+  const navigate = useNavigate();
+  const { userData } = useSelector((state) => state.user);
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  
  
-  const closeMenu = () => setIsMenuOpen(false);
- 
+  const closeMenu = (param) => {
+    if(param === "signOut"){
+      navigate('/');
+    }else if(param === "registerCourt"){
+      navigate("/courtRegister")
+    }
+    setIsMenuOpen(false);
+  } 
   return (
     <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
       <MenuHandler>
@@ -76,7 +82,7 @@ function ProfileMenu() {
             className="border border-orange-500 p-0.5"
             src="https://www.freeiconspng.com/uploads/profile-icon-9.png"
           />
-          <span>{ firstname } { lastname }</span>
+          <span>{ userData.firstname } { userData.lastname }</span>
           <ChevronDownIcon
             strokeWidth={2.5}
             className={`h-3 w-3 transition-transform ${
@@ -86,12 +92,22 @@ function ProfileMenu() {
         </Button>
       </MenuHandler>
       <MenuList className="p-1">
-        {profileMenuItems.map(({ label, icon }, key) => {
+      { userData.role === 1 && <MenuItem onClick={() => closeMenu("registerCourt")} className="flex items-center gap-2 rounded">
+          <Typography as='span' variant="small" className="font-normal">
+            Register Court
+          </Typography>
+        </MenuItem>}
+        <MenuItem onClick={() => closeMenu("signOut")} className="flex items-center gap-2 rounded">
+          <Typography as='span' variant="small" className="font-normal text-red-600 ">
+            Sign Out
+          </Typography>
+        </MenuItem>
+        {/* {profileMenuItems.map(({ label, icon }, key) => {
           const isLastItem = key === profileMenuItems.length - 1;
           return (
             <MenuItem
               key={label}
-              onClick={closeMenu}
+              onClick={() => closeMenu()}
               className={`flex items-center gap-2 rounded ${
                 isLastItem
                   ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
@@ -112,7 +128,7 @@ function ProfileMenu() {
               </Typography>
             </MenuItem>
           );
-        })}
+        })} */}
       </MenuList>
     </Menu>
   );
@@ -214,14 +230,24 @@ const navListItems = [
 ];
  
 function NavList() {
+  const navigate = useNavigate();
+  const handleClick = (label) => {
+    switch(label){
+      case "Home":
+        navigate('/home');
+        break;
+      default: 
+      break;
+    }
+  }
   return (
     <ul className="mb-4 mt-2 flex  flex-col gap-10 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center">
       {/* <NavListMenu /> */}
       {navListItems.map(({ label, icon }, key) => (
         <Typography
           key={label}
+          onClick={() => handleClick(label)}
           as="a"
-          href="#"
           variant="small"
           color="blue-gray"
           className="font-medium text-base"
@@ -249,7 +275,7 @@ export function NavBar() {
   }, []);
  
   return (
-    <nav className="bg-white sticky z-50 top-0 ">
+    <nav className="bg-white  sticky z-50 top-0 ">
     <Navbar className="mx-auto shadow-none border-none   bg-white p-2 lg:rounded lg:pl-6">
       <div className="relative mx-auto flex items-center text-gray-900">
         <Typography

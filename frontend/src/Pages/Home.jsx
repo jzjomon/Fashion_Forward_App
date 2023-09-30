@@ -7,7 +7,6 @@ import { Paginate } from "../Components/Paginate"
 const Home = () => {
   return (
     <>
-    {/* <main className="flex-wrap"> */}
        {/* nav */}
        <NavBar />
       {/* carousel  */}
@@ -18,7 +17,6 @@ const Home = () => {
       <Paginate />
       {/* footer  */}
       <Footer />
-    {/* </main> */}
      
     </>
   )

@@ -20,14 +20,15 @@ module.exports = withMT({
           '0%': {opacity : '1'},
           '50%': {opacity : '0'}, 
           '100%': {opacity : '1'}
-        }
+        },
         
       },
       animation: {
         'born': 'bornkey 1s ease 1',
         'death' : 'deathkey 1s ease 1',
-        'blink' : 'blinkkey 1s ease infinite'
+        'blink' : 'blinkkey 1s ease infinite',
       },
+
     },
   },
   plugins: [],
