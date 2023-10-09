@@ -5,6 +5,10 @@ const courtSchema = mongoose.Schema({
         type:String,
         required:true
     },
+    userId:{
+        type : mongoose.Types.ObjectId,
+        ref : 'users'
+    },
     location:{
         type:String,
         required:true

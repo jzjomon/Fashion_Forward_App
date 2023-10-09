@@ -34,7 +34,7 @@ const login =  (req, res) => {
         USER.findOne({ email: req.body.email }).then(data => {
             bcrypt.compare(req.body.password, data.password, (err, result) => {
                 if (result) {
-                    const token = jwt.sign({userid: data._id},process.env.TOKENPASS ,{
+                    const token = jwt.sign({ userData : data},process.env.TOKENPASS ,{
                         expiresIn:"3d"
                     });
                     res.status(200).json({ token: token , email: data.email, firstname: data.firstname, lastname: data.lastname, role: data.role});

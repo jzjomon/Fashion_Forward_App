@@ -9,11 +9,13 @@ import {
 import Button from './Button.jsx'
 import { useState } from "react";
 import AlertModal from "./AlertModal.jsx";
-import axios from 'axios';
+import { useNavigate } from "react-router-dom";
+import { instance } from "../config/axios.js";
 
 
 
 export function RegisterForm() {
+    const navigate = useNavigate();
     const [alertMessage, setAlertMessage] = useState('Inputs cannot be empty !');
     const [open, setOpen] = useState(false);
     const [img, setImg] = useState();
@@ -32,8 +34,11 @@ export function RegisterForm() {
             setAlertMessage("Please fill the registration form")
             setOpen(true)
         }else{
-           axios.post('http://localhost:8080/users/register-court',image,{params : registerData}).then(res => {
-            console.log(res);
+           instance.post('/users/register-court',image,{params : registerData}).then(res => {
+            navigate('/home');
+           }).catch(err => {
+            setAlertMessage("something went wrong");
+            setOpen(true)
            })
         }  
     }  

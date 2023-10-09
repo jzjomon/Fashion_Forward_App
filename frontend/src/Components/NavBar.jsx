@@ -92,7 +92,7 @@ function ProfileMenu() {
         </Button>
       </MenuHandler>
       <MenuList className="p-1">
-      { userData.role === 1 && <MenuItem onClick={() => closeMenu("registerCourt")} className="flex items-center gap-2 rounded">
+      { userData.role === 2 |  userData.role === 3 && <MenuItem onClick={() => closeMenu("registerCourt")} className="flex items-center gap-2 rounded">
           <Typography as='span' variant="small" className="font-normal">
             Register Court
           </Typography>

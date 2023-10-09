@@ -8,18 +8,18 @@ const registerCourt = (req, res) => {
         const filePath = path.join(__dirname,'../public/images',imageName );
         files.mv(filePath,(err) => {
             if(err){
-                console.log('error happend');
+                res.status(500).json({message: " Something went wrong"})
             }else{
-                COURT({name : req.query.courtName, location : req.query.location, rate : req.query.rate, about : req.query.about, image : imageName }).save().then((result) => {
-                    console.log(result);
+                COURT({name : req.query.courtName, userId : req.userId , location : req.query.location, rate : req.query.rate, about : req.query.about, image : imageName }).save().then((result) => {
+                    res.status(200).json({message : "Court registered successfully"})
                 }).catch((err) => {
-                    console.log(err);
+                    res.status(500).json({message : "Something went wrong"})
                 }); 
             }
         })
     } 
     catch (err){ 
- 
+        res.status(500).json({message : "Something went wrong"});
     }
 }
 
