@@ -23,4 +23,40 @@ const registerCourt = (req, res) => {
     }
 }
 
-module.exports = { registerCourt } 
+const getCourts = (req, res) => {
+    try {
+        COURT.find().then(result => {
+            res.status(200).json(result);
+        }).catch(err => {
+            res.status(401).json({message : "Something went wrong"});
+        })
+    } catch (error) {
+        res.status(500).json({message : "Something went wrong"});
+    }
+}
+
+const myCourts = (req, res) => {
+    try {
+        COURT.find({ userId : req.userId }).then(result => {
+            res.status(200).json(result);
+        }).catch(err => {
+            res.status(401).json({message : "Something went wrong"});
+        })
+    } catch (error) {
+        res.status(500).json({message : "Something went wrong"});
+    }
+}
+
+const getCourt = (req, res) => {
+    try { 
+        COURT.findOne({ _id : req.query.id }).then(result => {
+            res.status(200).json(result);
+        }).catch(err => {
+            res.status(401).json({message : "Something went wrong"});
+        })
+    } catch (error) {
+        res.status(500).json({message : "Something went wrong"});
+    }
+}
+
+module.exports = { registerCourt, getCourts, myCourts, getCourt } 

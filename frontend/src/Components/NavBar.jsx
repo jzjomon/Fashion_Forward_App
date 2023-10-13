@@ -1,9 +1,8 @@
 import React from "react";
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   Navbar,
-  MobileNav,
   Typography,
   Button,
   Menu,
@@ -13,6 +12,7 @@ import {
   Avatar,
   // Card,
   IconButton,
+  Collapse,
 } from "@material-tailwind/react";
 import {
   CubeTransparentIcon,
@@ -30,7 +30,8 @@ import {
   ChatBubbleLeftRightIcon,
   HomeIcon,
 } from "@heroicons/react/24/outline";
- 
+import { setUserLogin } from "../toolkit/userSlice";
+
 // // profile menu component
 // const profileMenuItems = [
 //   // {
@@ -50,23 +51,26 @@ import {
 //     icon: PowerIcon,
 //   },
 // ];
- 
+
 
 
 function ProfileMenu() {
   const navigate = useNavigate();
-  const { userData } = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  
- 
+  const dispatch = useDispatch();
+
   const closeMenu = (param) => {
-    if(param === "signOut"){
-      navigate('/');
-    }else if(param === "registerCourt"){
+    if (param === "signOut") {
+      dispatch(setUserLogin({ user: null }));
+      localStorage.removeItem("token")
+    } else if (param === "registerCourt") {
       navigate("/courtRegister")
+    } else if (param === "myCourts") {
+      navigate(`/myCourts/${user._id}`)
     }
     setIsMenuOpen(false);
-  } 
+  }
   return (
     <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
       <MenuHandler>
@@ -77,26 +81,32 @@ function ProfileMenu() {
         >
           <Avatar
             variant="circular"
-            size="sm" 
+            size="sm"
             alt="tania andrew"
             className="border border-orange-500 p-0.5"
             src="https://www.freeiconspng.com/uploads/profile-icon-9.png"
           />
-          <span>{ userData.firstname } { userData.lastname }</span>
+          <span>{user.firstname} {user.lastname}</span>
           <ChevronDownIcon
             strokeWidth={2.5}
-            className={`h-3 w-3 transition-transform ${
-              isMenuOpen ? "rotate-180" : ""
-            }`}
+            className={`h-3 w-3 transition-transform ${isMenuOpen ? "rotate-180" : ""
+              }`}
           />
         </Button>
       </MenuHandler>
       <MenuList className="p-1">
-      { userData.role === 2 |  userData.role === 3 && <MenuItem onClick={() => closeMenu("registerCourt")} className="flex items-center gap-2 rounded">
+        {user.role === 2 | user.role === 3 && (<><MenuItem onClick={() => closeMenu("registerCourt")} className="flex items-center gap-2 rounded">
           <Typography as='span' variant="small" className="font-normal">
             Register Court
           </Typography>
-        </MenuItem>}
+        </MenuItem>
+          <MenuItem onClick={() => closeMenu("myCourts")} className="flex items-center gap-2 rounded">
+            <Typography as='span' variant="small" className="font-normal">
+              My Court
+            </Typography>
+          </MenuItem>
+        </>
+        )}
         <MenuItem onClick={() => closeMenu("signOut")} className="flex items-center gap-2 rounded">
           <Typography as='span' variant="small" className="font-normal text-red-600 ">
             Sign Out
@@ -133,7 +143,7 @@ function ProfileMenu() {
     </Menu>
   );
 }
- 
+
 // nav list menu
 // const navListMenuItems = [
 //   {
@@ -152,10 +162,10 @@ function ProfileMenu() {
 //       "A complete set of UI Elements for building faster websites in less time.",
 //   },
 // ];
- 
+
 // function NavListMenu() {
 //   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
- 
+
 //   const renderItems = navListMenuItems.map(({ title, description }) => (
 //     <a href="#" key={title}>
 //       <MenuItem>
@@ -168,7 +178,7 @@ function ProfileMenu() {
 //       </MenuItem>
 //     </a>
 //   ));
- 
+
 //   return (
 //     <React.Fragment>
 //       <Menu allowHover open={isMenuOpen} handler={setIsMenuOpen}>
@@ -208,12 +218,12 @@ function ProfileMenu() {
 //     </React.Fragment>
 //   );
 // }
- 
+
 // nav list component
 const navListItems = [
   {
     label: "Home",
-    icon : HomeIcon,
+    icon: HomeIcon,
   },
   {
     label: "Turf",
@@ -228,16 +238,16 @@ const navListItems = [
     icon: ChatBubbleLeftRightIcon,
   },
 ];
- 
+
 function NavList() {
   const navigate = useNavigate();
   const handleClick = (label) => {
-    switch(label){
+    switch (label) {
       case "Home":
         navigate('/home');
         break;
-      default: 
-      break;
+      default:
+        break;
     }
   }
   return (
@@ -261,48 +271,48 @@ function NavList() {
     </ul>
   );
 }
- 
+
 export function NavBar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false);
- 
+
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur);
- 
+
   React.useEffect(() => {
     window.addEventListener(
       "resize",
       () => window.innerWidth >= 960 && setIsNavOpen(false),
     );
   }, []);
- 
+
   return (
     <nav className="bg-white  sticky z-50 top-0 ">
-    <Navbar className="mx-auto shadow-none border-none   bg-white p-2 lg:rounded lg:pl-6">
-      <div className="relative mx-auto flex items-center text-gray-900">
-        <Typography
-          as="a"
-          href="#"
-          className="mr-4 ml-2 cursor-pointer py-1.5 font-bold "
-        >
-          <span className="text-4xl font-serif"><span className="text-orange-600">T</span>urf <span className="text-orange-600">H</span>ouse</span>
-        </Typography>
-        <div className="absolute top-2/4 left-2/4 hidden -translate-x-2/4 -translate-y-2/4 lg:block">
-          <NavList />
+      <Navbar className="mx-auto shadow-none border-none   bg-white p-2 lg:rounded lg:pl-6">
+        <div className="relative mx-auto flex items-center text-gray-900">
+          <Typography
+            as="a"
+            href="#"
+            className="mr-4 ml-2 cursor-pointer py-1.5 font-bold "
+          >
+            <span className="text-4xl font-serif"><span className="text-orange-600">T</span>urf <span className="text-orange-600">H</span>ouse</span>
+          </Typography>
+          <div className="absolute top-2/4 left-2/4 hidden -translate-x-2/4 -translate-y-2/4 lg:block">
+            <NavList />
+          </div>
+          <IconButton
+            size="sm"
+            color="blue-gray"
+            variant="text"
+            onClick={toggleIsNavOpen}
+            className="ml-auto mr-2 lg:hidden"
+          >
+            <Bars2Icon className="h-6 w-6" />
+          </IconButton>
+          <ProfileMenu />
         </div>
-        <IconButton
-          size="sm"
-          color="blue-gray"
-          variant="text"
-          onClick={toggleIsNavOpen}
-          className="ml-auto mr-2 lg:hidden"
-        >
-          <Bars2Icon className="h-6 w-6" />
-        </IconButton>
-        <ProfileMenu />
-      </div>
-      <MobileNav open={isNavOpen} className="overflow-scroll">
-        <NavList />
-      </MobileNav>
-    </Navbar>
+        <Collapse open={isNavOpen} className="overflow-scroll">
+          <NavList />
+        </Collapse>
+      </Navbar>
     </nav>
   );
 }

@@ -37,7 +37,8 @@ const login =  (req, res) => {
                     const token = jwt.sign({ userData : data},process.env.TOKENPASS ,{
                         expiresIn:"3d"
                     });
-                    res.status(200).json({ token: token , email: data.email, firstname: data.firstname, lastname: data.lastname, role: data.role});
+                    data.password = null;
+                    res.status(200).json({ token: token , data});
                 } else {
                     res.status(500).json({ password: true });
                 }

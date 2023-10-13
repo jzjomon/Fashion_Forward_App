@@ -1,8 +1,8 @@
-import { Cards } from "../Components/Cards"
 import { ImgCarousel } from "../Components/Carousel"
 import { Footer } from "../Components/Footer"
 import { NavBar } from "../Components/NavBar"
 import { Paginate } from "../Components/Paginate"
+import Cards from "../Widgets/Cards"
 
 const Home = () => {
   return (

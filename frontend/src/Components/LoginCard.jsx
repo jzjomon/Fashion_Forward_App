@@ -4,7 +4,7 @@ import AlertModal from "./AlertModal";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from "react-redux";
-import { setUserData } from "../toolkit/userNameSlice";
+import { setUserLogin } from "../toolkit/userSlice";
 // import swal from 'sweetalert2'
 
 const LoginCard = ({ setLogin }) => {
@@ -28,10 +28,9 @@ const LoginCard = ({ setLogin }) => {
         try {
             if (details.email && details.password) {
                 axios.post('http://localhost:8080/login', details).then(({ data }) => {
-                    localStorage.setItem('token', data?.token)
-                    dispatch(setUserData({ userData : data }))
+                    dispatch(setUserLogin({ user: data?.data }));
+                    localStorage.setItem('token', data?.token);
                     navigate('/home')
-                    
                 }).catch((({ response: { data } }) => {
                     if (data?.exist) {
                         setAlertMessage('Invalid email !')
