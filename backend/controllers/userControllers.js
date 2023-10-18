@@ -25,7 +25,10 @@ const registerCourt = (req, res) => {
 
 const getCourts = (req, res) => {
     try {
-        COURT.find().then(result => {
+        const page = req.query.page;
+        const limit = 8;
+        const start = (page - 1) * limit;
+        COURT.find().limit(limit).skip(start).then(result => {
             res.status(200).json(result);
         }).catch(err => {
             res.status(401).json({message : "Something went wrong"});
