@@ -6,12 +6,14 @@ import CourtRegistration from './Pages/CourtRegistration';
 import MyCourts from './Pages/MyCourts';
 import { useSelector } from 'react-redux';
 import OpenCourt from './Pages/OpenCourt';
+import FourNotFour from './Pages/404';
 
 function App() {
   const auth = useSelector((state) => state.user.user);
   return (
     <>
       <Routes>
+        <Route path='*' element={<FourNotFour />} />
         <Route path='/' element={auth ? <Home /> : <Login />} />
         <Route path='/home' element={auth ? <Home /> : <Login />} />
         <Route path='/courtRegister' element={auth ? <CourtRegistration /> : <Login />} />

@@ -11,7 +11,7 @@ import { useState } from "react";
 import AlertModal from "./AlertModal.jsx";
 import { useNavigate } from "react-router-dom";
 import { instance } from "../config/axios.js";
-
+import Swal from "sweetalert2";
 
 
 export function RegisterForm() {
@@ -22,29 +22,42 @@ export function RegisterForm() {
     const [registerData, setRegisterData] = useState({
         courtName: "",
         location: "",
-        rate: 0,
         about: "",
     })
     const handleClick = (e) => {
         e.preventDefault();
         const image = new FormData();
-        image.append('img',img );
-        
-        if(registerData.about === "" || registerData.courtName === "" || registerData.location === "" || registerData.rate === 0 || registerData.image === null) {
+        image.append('img', img);
+
+        if (registerData.about === "" || registerData.courtName === "" || registerData.location === "" || registerData.image === null) {
             setAlertMessage("Please fill the registration form")
             setOpen(true)
-        }else{
-           instance.post('/users/register-court',image,{params : registerData}).then(res => {
-            navigate('/home');
-           }).catch(err => {
-            setAlertMessage("something went wrong");
-            setOpen(true)
-           })
-        }  
-    }  
+        } else {
+            instance.post('/users/register-court', image, { params: registerData }).then(res => {
+                Swal.fire({
+                    title: "successfully registered",
+                    timer: 2000,
+                    icon: "success",
+                    iconColor: "orange",
+                    showConfirmButton : false
+                }).then(() => {
+                    setRegisterData({
+                        courtName : "",
+                        location : "",
+                        about : ""
+                    });
+                    setImg(null);
+                    navigate('/courtRegister');
+                })
+            }).catch(err => {
+                setAlertMessage("something went wrong");
+                setOpen(true)
+            })
+        }
+    }
     return (
         <div className="flex items-center justify-center  mt-10 ">
-                        <AlertModal open={open} onClose={() => setOpen(false)}>
+            <AlertModal open={open} onClose={() => setOpen(false)}>
                 <div className="text-center w-53">
                     <div className="flex justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12  text-red-500">
@@ -68,11 +81,11 @@ export function RegisterForm() {
                     <div className="mb-4 flex flex-col gap-6">
                         <Input size="lg" value={registerData.courtName} label="Court Name" onChange={e => setRegisterData({ ...registerData, courtName: e.target.value })} />
                         <Input size="lg" value={registerData.location} label="Location" onChange={e => setRegisterData({ ...registerData, location: e.target.value })} />
-                        <Input size="lg" label="Rate" type="number" onChange={e => setRegisterData({ ...registerData, rate: e.target.value })} />
+                        {/* <Input size="lg" label="Rate" type="number" onChange={e => setRegisterData({ ...registerData, rate: e.target.value })} /> */}
                         <Textarea size="lg" value={registerData.about} label="Something description about you court" onChange={e => setRegisterData({ ...registerData, about: e.target.value })} />
-                        <Input size="lg" label="Images of Court"  onChange={(e) => setImg(e.target.files[0])} type="file" accept="image/*" />
+                        <Input size="lg" label="Images of Court" onChange={(e) => setImg(e.target.files[0])} type="file" accept="image/*" />
                         <div className="flex justify-center">
-                            {img  && <img src={ URL.createObjectURL(img)} className="w-fit rounded-lg " alt="court"/>}
+                            {img && <img src={URL.createObjectURL(img)} className="w-fit rounded-lg " alt="court" />}
                         </div>
 
                     </div>

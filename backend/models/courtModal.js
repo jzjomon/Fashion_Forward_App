@@ -13,10 +13,6 @@ const courtSchema = mongoose.Schema({
         type:String,
         required:true
     },
-    rate:{
-        type:String,
-        required:true
-    },
     about:{
         type:String,
         required:true

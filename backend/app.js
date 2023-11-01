@@ -8,6 +8,7 @@ require('dotenv').config()
 
 var authRouter = require('./routes/auth');
 var usersRouter = require('./routes/users');
+const vendorRoutes = require('./routes/vendor');
 const connectDataBase = require('./config/dbConfig');
 
 var app = express();
@@ -22,6 +23,7 @@ connectDataBase();
 
 app.use('/', authRouter);
 app.use('/users', usersRouter);
+app.use('/vendor', vendorRoutes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

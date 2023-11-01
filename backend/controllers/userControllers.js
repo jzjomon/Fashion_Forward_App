@@ -1,5 +1,6 @@
 const COURT = require('../models/courtModal.js');
-const path = require('path')
+const path = require('path');
+const COURT_SCHEDULES = require('../models/courtScheduleModal.js');
 
 const registerCourt = (req, res) => { 
     try{
@@ -10,7 +11,7 @@ const registerCourt = (req, res) => {
             if(err){
                 res.status(500).json({message: " Something went wrong"})
             }else{
-                COURT({name : req.query.courtName, userId : req.userId , location : req.query.location, rate : req.query.rate, about : req.query.about, image : imageName }).save().then((result) => {
+                COURT({name : req.query.courtName, userId : req.userId , location : req.query.location, about : req.query.about, image : imageName }).save().then((result) => {
                     res.status(200).json({message : "Court registered successfully"})
                 }).catch((err) => {
                     res.status(500).json({message : "Something went wrong"})
@@ -62,4 +63,16 @@ const getCourt = (req, res) => {
     }
 }
 
-module.exports = { registerCourt, getCourts, myCourts, getCourt } 
+const getLatestDate = (req, res) => {
+    try {
+        COURT_SCHEDULES.find({courtId : req.query.courtId}).sort({date : -1}).then(response => {
+            res.status(200).json({latestDate : new Date(response[0].date.setDate(response[0].date.getDate() + 1))});
+        }).catch(error => {
+            console.log(error);
+        })
+    } catch (error) {
+      res.status(500).json({message : "Something went wrong"});  
+    }
+}
+
+module.exports = { registerCourt, getCourts, myCourts, getCourt, getLatestDate } 
