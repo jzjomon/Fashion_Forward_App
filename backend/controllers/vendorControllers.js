@@ -1,4 +1,40 @@
 const COURT_SCHEDULES = require('../models/courtScheduleModal.js');
+const path = require('path');
+
+
+const registerCourt = (req, res) => { 
+    try{
+        const files = req.files.img;
+        const imageName = `${Date.now()}-${files.name}`;
+        const filePath = path.join(__dirname,'../public/images',imageName );
+        files.mv(filePath,(err) => {
+            if(err){
+                res.status(500).json({message: " Something went wrong"})
+            }else{
+                COURT({name : req.query.courtName, userId : req.userId , location : req.query.location, about : req.query.about, image : imageName }).save().then((result) => {
+                    res.status(200).json({message : "Court registered successfully"})
+                }).catch((err) => {
+                    res.status(500).json({message : "Something went wrong"})
+                }); 
+            }
+        })
+    } 
+    catch (err){ 
+        res.status(500).json({message : "Something went wrong"});
+    }
+}
+
+const getLatestDate = (req, res) => {
+    try {
+        COURT_SCHEDULES.find({courtId : req.query.courtId}).sort({date : -1}).then(response => {
+            res.status(200).json({latestDate : new Date(response[0]?.date?.setDate(response[0]?.date?.getDate() + 1))});
+        }).catch(error => {
+            console.log(error);
+        })
+    } catch (error) {
+      res.status(500).json({message : "Something went wrong"});  
+    }
+}
 
 const addTimings = (req, res) => {
     try {
@@ -30,4 +66,4 @@ const addTimings = (req, res) => {
     }
 }
 
-module.exports = { addTimings }
+module.exports = { addTimings, getLatestDate, registerCourt }

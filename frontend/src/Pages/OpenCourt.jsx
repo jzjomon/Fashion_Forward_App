@@ -11,6 +11,8 @@ import swall from 'sweetalert2'
 
 const OpenCourt = () => {
   const { id } = useParams();
+  const [slot, setSlot] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [timings, setTimings] = useState(TIMINGS);
   const [selectedTimings, setSelectedTimings] = useState([]);
   const [openTimings, setOpenTimings] = useState(false);
@@ -23,6 +25,8 @@ const OpenCourt = () => {
     startDate: "",
     endDate: "",
   });
+  const [selectedSchedules, setSelectedSchedules] = useState([]);
+  const [schedulesId, setSchedulesId] = useState([]);
   const numRef = useRef();
   useEffect(() => {
     instance.get(`/users/getCourt`, { params: { id } }).then(({ data }) => {
@@ -30,16 +34,24 @@ const OpenCourt = () => {
     }).catch(err => {
       console.log(err);
     })
-  }, [id, user]);
+  }, [id]);
+  useEffect(() => {
+    getSlotData();
+  }, [])
+  const getSlotData = () => {
+    instance.get('/users/getSlots', { params: { date: selectedDate, courtId: id } }).then(res => {
+      setSlot(res.data.response);
+    })
+  };
   useEffect(() => {
     if (user?.role === 2 && user?._id === data?.userId) {
-      instance.get('/users/getLatestDate', { params: { courtId: id } }).then(res => {
+      instance.get('/vendor/getLatestDate', { params: { courtId: id } }).then(res => {
         setLatestDate(res.data.latestDate);
       }).catch(err => {
         console.log(err);
       })
     }
-  }, [open === true])
+  }, [open === true]);
   const addTime = (ele) => {
     setSelectedTimings([...selectedTimings, ele]);
     const timing = timings.filter(time => time !== ele);
@@ -100,6 +112,107 @@ const OpenCourt = () => {
       })
     }
   }
+
+  function loadScript(src) {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
+  }
+
+  async function displayRazorpay() {
+    const res = await loadScript(
+      "https://checkout.razorpay.com/v1/checkout.js"
+    );
+
+    if (!res) {
+      alert("Razorpay SDK failed to load. Are you online?");
+      return;
+    }
+    
+    const arr = await selectedSchedules.map(ele =>  ele._id);
+   
+    // creating a new order
+    const result = await instance.post(BASEURL + "/payment/orders", { data: arr });
+
+    if (!result) {
+
+      alert("Server error. Are you online?");
+      return;
+    }
+
+    // Getting the order details back
+  
+    const { amount, id: order_id, currency } = result.data.order;
+    const idArr = result.data.idArr;
+
+    const options = {
+      key: "rzp_test_GdkuntxOlaolUC", // Enter the Key ID generated from the Dashboard
+      amount: amount.toString(),
+      currency: currency,
+      name: "Soumya Corp.",
+      description: "Test Transaction",
+      // image: { logo },
+      order_id: order_id,
+      handler: async function (response) {
+        const data = {
+          orderCreationId: order_id,
+          razorpayPaymentId: response.razorpay_payment_id,
+          razorpayOrderId: response.razorpay_order_id,
+          razorpaySignature: response.razorpay_signature,
+        };
+
+        const result = await instance.post(BASEURL + "/payment/success", { data , idArr });
+
+        alert(result.data.msg);
+      },
+      prefill: {
+        name: "Soumya Dey",
+        email: "SoumyaDey@example.com",
+        contact: "9999999999",
+      },
+      notes: {
+        address: "Soumya Dey Corporate Office",
+      },
+      theme: {
+        color: "#61dafb",
+      },
+    };
+
+    const paymentObject = new window.Razorpay(options);
+    paymentObject.open();
+  }
+  const handleSchedules = (i) => {
+    setSelectedSchedules([...selectedSchedules, slot[i]]);
+    const arr = slot.filter(ele => ele !== slot[i]);
+    setSlot(arr);
+  };
+  const handleSlot = (i) => {
+    setSlot([selectedSchedules[i], ...slot]);
+    const arr = selectedSchedules.filter(ele => ele !== selectedSchedules[i]);
+    setSelectedSchedules(arr);
+  }
+  const book = () => {
+    swall.fire({
+      title: "Do you want to book this schedules ?",
+      icon: "question",
+      showCancelButton: true
+    }).then((res) => {
+      if (res.isConfirmed) {
+        displayRazorpay();
+      }
+      getSlotData();
+      setSelectedSchedules([]);
+    })
+  }
+  console.log(slot);
   return (
     <>
       <NavBar />
@@ -123,6 +236,26 @@ const OpenCourt = () => {
           {user?.role === 2 && user?._id === data?.userId && (<div className="p-4">
             <Button label="Open Bookings" handleClick={() => setOpen(true)} />
           </div>)}
+          <div className="text-center p-4">
+            <label className="font-bold text-xl">Select a date : </label>
+            <input type="date" min={new Date().toISOString().split("T")[0]} value={new Date(selectedDate).toISOString().split("T")[0]} onChange={(e) => setSelectedDate(new Date(e.target.value))} className="border border-orange-600 ps-2 pe-2 m-2 rounded text-orange-600" />
+            <Button label="Get Schedules" handleClick={() => getSlotData()} />
+          </div>
+          <div className="flex justify-between">
+            <div className="p-4 w-[50%]">
+              {slot.length > 0 ? <h1 className="text-center font-bold text-2xl p-2 ">Select Schedule</h1> : <h1 className="text-center font-bold text-2xl p-2 ">No Schedules Available</h1>}
+              {slot.map((ele, i) => (
+                <button key={i} className={`border rounded m-1 p-2 ${ele.bookedBy ? `border-blue-300 text-blue-300 transition-all ` : `border-orange-600 text-orange-600 `} `} onMouseOver={ ele.bookedBy && ((e) => e.target.innerHTML = "already booked")} onMouseLeave={ele.bookedBy && ((e) => e.target.innerHTML = ele.slot.time)} onClick={() => { !ele.bookedBy && handleSchedules(i)}}>{ele.slot.time}</button>
+              ))}
+            </div>
+            <div className="p-4 w-[50%]">
+              {selectedSchedules.length > 0 ? <h1 className="text-center font-bold text-2xl p-2 ">Selected Schedule</h1> : <h1 className="text-center font-bold text-2xl p-2 ">No Schedules Selected</h1>}
+              {selectedSchedules.map((ele, i) => (
+                <button key={i} className="border p-2 border-orange-600 text-orange-600 rounded m-1" onClick={(e) => handleSlot(i)}>{ele.slot.time}</button>
+              ))}
+              {selectedSchedules.length > 0 && <Button label="Book" handleClick={book} />}
+            </div>
+          </div>
         </div>
       </div>
       <AlertModal open={open} onClose={() => setOpen(false)}>
@@ -133,7 +266,7 @@ const OpenCourt = () => {
         <div className="md:flex pt-4">
           <div>
             <label>Start : </label>
-            <input type="date" min={latestDate?.split('T')[0] ?? `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}` } value={mainTimings.startDate} onChange={(e) => setMainTimings({ ...mainTimings, startDate: e.target.value })} className="border mr-5 mb-4 border-black rounded" />
+            <input type="date" min={latestDate?.split('T')[0] ?? `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`} value={mainTimings.startDate} onChange={(e) => setMainTimings({ ...mainTimings, startDate: e.target.value })} className="border mr-5 mb-4 border-black rounded" />
           </div>
           <div>
             <label>End : </label>

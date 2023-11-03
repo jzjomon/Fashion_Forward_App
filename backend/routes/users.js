@@ -1,15 +1,13 @@
 var express = require('express');
-const { registerCourt, getCourts, myCourts, getCourt, getLatestDate } = require('../controllers/userControllers');
-const fileUpload = require('express-fileupload');
-const userAuth = require('../middleWares/vendorAuth');
+const { getCourts, myCourts, getCourt, getSlots } = require('../controllers/userControllers');
+const auth = require('../middleWares/auth');
 var router = express.Router();
 
 
-router.post('/register-court', fileUpload({createParentPath: true}), userAuth, registerCourt); 
-router.get('/getCourts',userAuth, getCourts);
-router.get('/myCourts', userAuth, myCourts);
-router.get('/getCourt', userAuth, getCourt);
-router.get('/getLatestDate', userAuth, getLatestDate)
+router.get('/getCourts',auth, getCourts);
+router.get('/myCourts', auth, myCourts);
+router.get('/getCourt', auth, getCourt);
+router.get('/getSlots', auth, getSlots);
   
 module.exports = router;
  

@@ -1,28 +1,7 @@
 const COURT = require('../models/courtModal.js');
-const path = require('path');
 const COURT_SCHEDULES = require('../models/courtScheduleModal.js');
+const ObjectId = require('mongoose').Types.ObjectId;
 
-const registerCourt = (req, res) => { 
-    try{
-        const files = req.files.img;
-        const imageName = `${Date.now()}-${files.name}`;
-        const filePath = path.join(__dirname,'../public/images',imageName );
-        files.mv(filePath,(err) => {
-            if(err){
-                res.status(500).json({message: " Something went wrong"})
-            }else{
-                COURT({name : req.query.courtName, userId : req.userId , location : req.query.location, about : req.query.about, image : imageName }).save().then((result) => {
-                    res.status(200).json({message : "Court registered successfully"})
-                }).catch((err) => {
-                    res.status(500).json({message : "Something went wrong"})
-                }); 
-            }
-        })
-    } 
-    catch (err){ 
-        res.status(500).json({message : "Something went wrong"});
-    }
-}
 
 const getCourts = (req, res) => {
     try {
@@ -52,7 +31,7 @@ const myCourts = (req, res) => {
 }
 
 const getCourt = (req, res) => {
-    try { 
+    try {
         COURT.findOne({ _id : req.query.id }).then(result => {
             res.status(200).json(result);
         }).catch(err => {
@@ -63,16 +42,52 @@ const getCourt = (req, res) => {
     }
 }
 
-const getLatestDate = (req, res) => {
+
+
+const getSlots = (req, res) => {
     try {
-        COURT_SCHEDULES.find({courtId : req.query.courtId}).sort({date : -1}).then(response => {
-            res.status(200).json({latestDate : new Date(response[0].date.setDate(response[0].date.getDate() + 1))});
-        }).catch(error => {
-            console.log(error);
+        let slotId ;
+        if (new Date().toISOString().split("T")[0] === new Date(req.query.date).toISOString().split("T")[0] ) {
+            slotId = parseInt(new Date(req.query.date).getHours());
+        } else {
+            slotId = 0;
+        }
+        COURT_SCHEDULES.aggregate([
+            {
+                $match : {
+                    courtId : new ObjectId(req.query.courtId),
+                    date : new Date(req.query.date.split("T")[0]),
+                    "slot.id" : { $gt : slotId}
+                }
+            },
+            {
+                $lookup : {
+                    from : "courts",
+                    localField : "courtId",
+                    foreignField : "_id",
+                    as : "court"
+                }
+            },
+            {
+                $project : {
+                    _id : 1,
+                    date : 1,
+                    slot : 1,
+                    rate : 1,
+                    bookedBy : 1,
+                    court : {$arrayElemAt : ['$court',0]}  
+                }
+            }
+        ]).then(response => {
+            res.status(200).json({response})
+        }).catch(err => {
+            res.status(400).json({ message : "Something went wrong"})
         })
     } catch (error) {
-      res.status(500).json({message : "Something went wrong"});  
+       res.status(500).json({ message : "Something went wrong"}) 
     }
 }
 
-module.exports = { registerCourt, getCourts, myCourts, getCourt, getLatestDate } 
+
+
+module.exports = { getCourts, myCourts, getCourt, getSlots } 

@@ -33,7 +33,7 @@ export function RegisterForm() {
             setAlertMessage("Please fill the registration form")
             setOpen(true)
         } else {
-            instance.post('/users/register-court', image, { params: registerData }).then(res => {
+            instance.post('/vendor/register-court', image, { params: registerData }).then(res => {
                 Swal.fire({
                     title: "successfully registered",
                     timer: 2000,
