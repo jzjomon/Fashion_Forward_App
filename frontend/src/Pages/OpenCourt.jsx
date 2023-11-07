@@ -131,22 +131,24 @@ const OpenCourt = () => {
     const res = await loadScript(
       "https://checkout.razorpay.com/v1/checkout.js"
     );
-
     if (!res) {
-      alert("Razorpay SDK failed to load. Are you online?");
-      return;
+      return (swall.fire({
+        title : "Razorpay SDK failed to load. Are you online?",
+        icon : "error"
+      }).then(() => {}))
     }
     
-    const arr = await selectedSchedules.map(ele =>  ele._id);
+    const arr = selectedSchedules.map(ele =>  ele._id);
    
     // creating a new order
     const result = await instance.post(BASEURL + "/payment/orders", { data: arr });
 
     if (!result) {
-
-      alert("Server error. Are you online?");
-      return;
-    }
+      return (swall.fire({
+        title : "Server error. Are you online ? ",
+        icon : "error",
+      }).then(() => {return}))
+    } 
 
     // Getting the order details back
   
@@ -157,7 +159,7 @@ const OpenCourt = () => {
       key: "rzp_test_GdkuntxOlaolUC", // Enter the Key ID generated from the Dashboard
       amount: amount.toString(),
       currency: currency,
-      name: "Soumya Corp.",
+      name: `${user?.firstname} ${user?.lastname}`,
       description: "Test Transaction",
       // image: { logo },
       order_id: order_id,
@@ -169,13 +171,27 @@ const OpenCourt = () => {
           razorpaySignature: response.razorpay_signature,
         };
 
-        const result = await instance.post(BASEURL + "/payment/success", { data , idArr });
+        instance.post(BASEURL + "/payment/success", { data , idArr }).then(res => {
+          swall.fire({
+            title : "Booking is Success",
+            icon : "success"
+          }).then(() => {
+            getSlotData()
+          })
 
-        alert(result.data.msg);
+        }).catch(err => {
+          swall.fire({
+            title : "Something went wrong !",
+            icon : "error"
+          }).then(() => {
+            getSlotData()
+          })
+        })
+        
       },
       prefill: {
-        name: "Soumya Dey",
-        email: "SoumyaDey@example.com",
+        name: `${user.firstname} ${user.lastname}`,
+        email: user.email,
         contact: "9999999999",
       },
       notes: {
@@ -212,7 +228,6 @@ const OpenCourt = () => {
       setSelectedSchedules([]);
     })
   }
-  console.log(slot);
   return (
     <>
       <NavBar />

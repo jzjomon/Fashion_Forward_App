@@ -23,6 +23,9 @@ const courtScheduleSchema = mongoose.Schema({
     courtId : {
         type : mongoose.Types.ObjectId,
         ref : "courts"
+    },
+    paymentOrders : {
+        type : Array,
     }
 
 })
