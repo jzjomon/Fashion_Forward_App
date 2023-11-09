@@ -265,27 +265,26 @@ const OpenCourt = () => {
   };
   const handleSlot = (i) => {
     try {
-    setSlot([selectedSchedules[i], ...slot]);
-    const arr = selectedSchedules.filter(ele => ele !== selectedSchedules[i]);
-    setSelectedSchedules(arr);
-  } catch (error) {
-    Alert("Something went wrong !", "error");
+      setSlot([selectedSchedules[i], ...slot]);
+      const arr = selectedSchedules.filter(ele => ele !== selectedSchedules[i]);
+      setSelectedSchedules(arr);
+    } catch (error) {
+      Alert("Something went wrong !", "error");
+    }
   }
-  }
-  const book = () => {
+  const book = (data) => {
     try {
-    Alert("Do you want to book this timing ?", "question", "cancelBtn").then((res) => {
-      if (res.isConfirmed) {
-        displayRazorpay();
-      }
-      getSlotData();
-      setSelectedSchedules([]);
-    })    
-  } catch (error) {
-    Alert("Something went wrong !", "error");
+      Alert(`You are seleced ${data.map(ele => ele.slot.time)}. Do you want to book this timing ?`, "question", "cancelBtn").then((res) => {
+        if (res.isConfirmed) {
+          displayRazorpay();
+        }
+        getSlotData();
+        setSelectedSchedules([]);
+      })
+    } catch (error) {
+      Alert("Something went wrong !", "error");
+    }
   }
-  }
-  // dispatch(setSpinner(false))
 
   return (
     <>
@@ -296,16 +295,16 @@ const OpenCourt = () => {
         </div>
         <div className="md:w-[45%] p-4  ">
           <div className=" md:flex justify-around border p-10 rounded-lg border-gray-400 shadow-xl shadow-gray-200">
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col text-xl font-bold gap-5">
               <h1>Name : {data?.name}</h1>
               <h2>Location : {data?.location}</h2>
               <h3>About : {data?.about}</h3>
-              <h4>rating : </h4>
             </div>
-            <div className="flex flex-col gap-5 pt-3 md:pt-0">
+            {/* <div className="flex flex-col gap-5 pt-3 md:pt-0">
+              <h4>rating : </h4>
               <h1>Owner Name :</h1>
               <h2>Contact :</h2>
-            </div>
+            </div> */}
           </div>
           {user?.role === 2 && user?._id === data?.userId && (<div className="p-4">
             <Button label="Open Bookings" handleClick={() => setOpen(true)} />
@@ -327,7 +326,7 @@ const OpenCourt = () => {
               {selectedSchedules.map((ele, i) => (
                 <button key={i} className="border p-2 border-orange-600 text-orange-600 rounded m-1" onClick={(e) => handleSlot(i)}>{ele.slot.time}</button>
               ))}
-              {selectedSchedules.length > 0 && <Button label="Book" handleClick={book} />}
+              {selectedSchedules.length > 0 && <Button label="Book" handleClick={() => book(selectedSchedules)} />}
             </div>
           </div>
         </div>
