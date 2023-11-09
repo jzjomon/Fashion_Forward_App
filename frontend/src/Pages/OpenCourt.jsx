@@ -38,8 +38,8 @@ const OpenCourt = () => {
         dispatch(setSpinner(false))
       }).catch(err => {
         dispatch(setSpinner(false))
-        dispatch(setUserLogin({ user: null }));
-        localStorage.removeItem("token")
+        // dispatch(setUserLogin({ user: null }));
+        // localStorage.removeItem("token")
       })
     } catch (error) {
       dispatch(setSpinner(false))
@@ -57,8 +57,8 @@ const OpenCourt = () => {
         setSlot(res.data.response);
       }).catch(() => {
         dispatch(setSpinner(false))
-        dispatch(setUserLogin({ user: null }));
-        localStorage.removeItem("token")
+        // dispatch(setUserLogin({ user: null }));
+        // localStorage.removeItem("token")
       })
     } catch (error) {
       dispatch(setSpinner(false))
@@ -74,8 +74,8 @@ const OpenCourt = () => {
           dispatch(setSpinner(false))
         }).catch(err => {
           dispatch(setSpinner(false))
-          dispatch(setUserLogin({ user: null }));
-          localStorage.removeItem("token")
+          // dispatch(setUserLogin({ user: null }));
+          // localStorage.removeItem("token")
         })
       }
     } catch (error) {
@@ -127,8 +127,8 @@ const OpenCourt = () => {
           })
         }).catch(err => {
           dispatch(setSpinner(false))
-          dispatch(setUserLogin({ user: null }));
-          localStorage.removeItem("token")
+          // dispatch(setUserLogin({ user: null }));
+          // localStorage.removeItem("token")
           setSelectedTimings([]);
           setTimings(TIMINGS);
           setMainTimings({

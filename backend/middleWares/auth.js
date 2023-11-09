@@ -8,7 +8,7 @@ const auth = (req, res, next) => {
                 req.userId = data?.userData._id;
                 next();
             } else {
-                res.status(401).json({ message: "Unauthorized User" });
+                res.status(401).json({ auth : false});
             }
         })
     } catch (error) {

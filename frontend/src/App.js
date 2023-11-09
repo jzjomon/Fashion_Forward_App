@@ -8,23 +8,26 @@ import { useSelector } from 'react-redux';
 import OpenCourt from './Pages/OpenCourt';
 import FourNotFour from './Pages/404';
 import { Spinner } from '@material-tailwind/react';
+import { Authorization, LoginOrHome } from './Constants/authorization';
 
 function App() {
-  const auth = useSelector((state) => state.user.user);
   const { spinner } = useSelector(state => state.spinner);
-
   return (
     <>
       {spinner && <div className='fixed top-0 right-0 left-0 w-full bg-blue-gray-300 h-[100vh] flex justify-center items-center z-50'>
         <Spinner className='h-16 w-16' color='orange' />
       </div>}
       <Routes>
-        <Route path='*' element={<FourNotFour />} />
-        <Route path='/' element={auth ? <Home /> : <Login />} />
-        <Route path='/home' element={auth ? <Home /> : <Login />} />
-        <Route path='/courtRegister' element={auth ? <CourtRegistration /> : <Login />} />
-        <Route path='/myCourts/:id' element={auth ? <MyCourts /> : <Login />} />
-        <Route path='/openCourt/:id' element={auth ? <OpenCourt /> : <Login />} />
+        <Route element={<LoginOrHome />} >
+          <Route path='/' element={<Login />} />
+        </Route>
+        <Route element={<Authorization />} >
+          <Route path='*' element={<FourNotFour />} />
+          <Route path='/home' element={<Home />} />
+          <Route path='/courtRegister' element={<CourtRegistration />} />
+          <Route path='/myCourts/:id' element={<MyCourts />} />
+          <Route path='/openCourt/:id' element={<OpenCourt />} />
+        </Route>
       </Routes>
     </>
   )

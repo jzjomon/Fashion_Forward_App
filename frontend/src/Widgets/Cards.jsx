@@ -17,9 +17,8 @@ const Cards = () => {
             instance.get('/users/getCourts', { params: { page } }).then(res => {
                 setCourts(res.data);
                 dispatch(setSpinner(false))
-            }).catch(err => {
-                dispatch(setUserLogin({ user: null }));
-                localStorage.removeItem("token")
+            }).catch((err) => {
+                Alert("Something went wrong !", "error")
                 dispatch(setSpinner(false))
             })
         } catch (error) {

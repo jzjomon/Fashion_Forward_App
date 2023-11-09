@@ -64,6 +64,7 @@ function ProfileMenu() {
     if (param === "signOut") {
       dispatch(setUserLogin({ user: null }));
       localStorage.removeItem("token")
+      navigate('/')
     } else if (param === "registerCourt") {
       navigate("/courtRegister")
     } else if (param === "myCourts") {
