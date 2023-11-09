@@ -2,9 +2,9 @@ import {
   Card,
   CardHeader,
   CardBody,
-  CardFooter,
+  // CardFooter,
   Typography,
-  Button,
+  // Button,
 } from "@material-tailwind/react";
 import { BASEURL }  from '../Constants/baseUrl.js'
 import { useNavigate } from "react-router-dom";
@@ -34,9 +34,9 @@ export function CardOne({ title, courts }) {
                   {court.about}
                 </Typography>
               </CardBody>
-              <CardFooter className="pt-0">
+              {/* <CardFooter className="pt-0">
                 <Button className="border border-orange-500 text-orange-500  bg-white hover:text-white hover:bg-orange-500">Read More</Button>
-              </CardFooter>
+              </CardFooter> */}
             </Card>
           ))
         }

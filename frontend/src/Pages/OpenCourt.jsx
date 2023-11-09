@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom"
 import { instance } from "../config/axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { BASEURL } from "../Constants/baseUrl";
 import { NavBar } from "../Components/NavBar";
 import Button from "../Components/Button";
 import AlertModal from "../Components/AlertModal";
 import { TIMINGS } from '../Constants/Timings.js';
-import swall from 'sweetalert2'
+import { Alert, Toast } from "../Constants/sweetAlert.js";
+import { setUserLogin } from "../toolkit/userSlice.js";
+import { setSpinner } from "../toolkit/spinnerSlice.js";
 
 const OpenCourt = () => {
   const { id } = useParams();
@@ -26,208 +28,265 @@ const OpenCourt = () => {
     endDate: "",
   });
   const [selectedSchedules, setSelectedSchedules] = useState([]);
-  const [schedulesId, setSchedulesId] = useState([]);
   const numRef = useRef();
+  const dispatch = useDispatch()
   useEffect(() => {
-    instance.get(`/users/getCourt`, { params: { id } }).then(({ data }) => {
-      setData(data);
-    }).catch(err => {
-      console.log(err);
-    })
+    try {
+      dispatch(setSpinner(true))
+      instance.get(`/users/getCourt`, { params: { id } }).then(({ data }) => {
+        setData(data);
+        dispatch(setSpinner(false))
+      }).catch(err => {
+        dispatch(setSpinner(false))
+        dispatch(setUserLogin({ user: null }));
+        localStorage.removeItem("token")
+      })
+    } catch (error) {
+      dispatch(setSpinner(false))
+      Alert("Something went wrong !", "error")
+    }
   }, [id]);
   useEffect(() => {
     getSlotData();
   }, [])
   const getSlotData = () => {
-    instance.get('/users/getSlots', { params: { date: selectedDate, courtId: id } }).then(res => {
-      setSlot(res.data.response);
-    })
+    try {
+      dispatch(setSpinner(true))
+      instance.get('/users/getSlots', { params: { date: selectedDate, courtId: id } }).then(res => {
+        dispatch(setSpinner(false))
+        setSlot(res.data.response);
+      }).catch(() => {
+        dispatch(setSpinner(false))
+        dispatch(setUserLogin({ user: null }));
+        localStorage.removeItem("token")
+      })
+    } catch (error) {
+      dispatch(setSpinner(false))
+      Alert("Something went wrong !", "error")
+    }
   };
   useEffect(() => {
-    if (user?.role === 2 && user?._id === data?.userId) {
-      instance.get('/vendor/getLatestDate', { params: { courtId: id } }).then(res => {
-        setLatestDate(res.data.latestDate);
-      }).catch(err => {
-        console.log(err);
-      })
+    try {
+      if (user?.role === 2 && user?._id === data?.userId) {
+        dispatch(setSpinner(true))
+        instance.get('/vendor/getLatestDate', { params: { courtId: id } }).then(res => {
+          setLatestDate(res.data.latestDate);
+          dispatch(setSpinner(false))
+        }).catch(err => {
+          dispatch(setSpinner(false))
+          dispatch(setUserLogin({ user: null }));
+          localStorage.removeItem("token")
+        })
+      }
+    } catch (error) {
+      dispatch(setSpinner(false))
+      Alert("Something went wrong !", "error")
     }
   }, [open === true]);
   const addTime = (ele) => {
-    setSelectedTimings([...selectedTimings, ele]);
-    const timing = timings.filter(time => time !== ele);
-    setTimings(timing);
+    try {
+      setSelectedTimings([...selectedTimings, ele]);
+      const timing = timings.filter(time => time !== ele);
+      setTimings(timing);
+    } catch (error) {
+      Alert("Something went wrong !", "error");
+    }
   }
   const removeTime = (ele) => {
-    const timing = selectedTimings.filter(time => time !== ele);
-    setSelectedTimings(timing);
-    setTimings([ele, ...timings])
+    try {
+      const timing = selectedTimings.filter(time => time !== ele);
+      setSelectedTimings(timing);
+      setTimings([ele, ...timings])
+    } catch (error) {
+      Alert("Something went wrong !", "error");
+    }
   }
   const handleSubmit = () => {
-    if (mainTimings.startDate && mainTimings.endDate && rate && selectedTimings.length > 0) {
-      instance.post("/vendor/addTimings", {
-        data: {
-          date: mainTimings,
-          rate,
-          schedules: selectedTimings,
-          courtId: id,
-        }
-      }).then(res => {
-        setSelectedTimings([]);
-        setTimings(TIMINGS);
-        setMainTimings({
-          startDate: "",
-          endDate: "",
+    try {
+      if (mainTimings.startDate && mainTimings.endDate && rate && selectedTimings.length > 0) {
+        dispatch(setSpinner(true))
+        instance.post("/vendor/addTimings", {
+          data: {
+            date: mainTimings,
+            rate,
+            schedules: selectedTimings,
+            courtId: id,
+          }
+        }).then(res => {
+          dispatch(setSpinner(false))
+          setSelectedTimings([]);
+          setTimings(TIMINGS);
+          setMainTimings({
+            startDate: "",
+            endDate: "",
+          });
+          setRate(null);
+          numRef.current.value = null;
+          Alert("Succesfully added bookings", "success").then(() => {
+            setOpen(false);
+          })
+        }).catch(err => {
+          dispatch(setSpinner(false))
+          dispatch(setUserLogin({ user: null }));
+          localStorage.removeItem("token")
+          setSelectedTimings([]);
+          setTimings(TIMINGS);
+          setMainTimings({
+            startDate: "",
+            endDate: "",
+          });
+          setRate(null);
+          numRef.current.value = null;
+          Alert("Failed to add bookings", "error").then(() => {
+            setOpen(false);
+          })
         });
-        setRate(null);
-        numRef.current.value = null;
-        swall.fire({
-          title: "Success",
-          text: "successfully added bookings",
-          icon: "success",
-        }).then(() => {
-          setOpen(false);
-        })
-      }).catch(err => {
-        setSelectedTimings([]);
-        setTimings(TIMINGS);
-        setMainTimings({
-          startDate: "",
-          endDate: "",
-        });
-        setRate(null);
-        numRef.current.value = null;
-        swall.fire({
-          text: "Failed to add bookings",
-          icon: "error"
-        }).then(() => {
-          setOpen(false);
-        })
-      });
 
-    } else {
-      swall.fire({
-        title: "Inputs cannot be empty !",
-        icon: "error",
-        confirmButtonColor: 'orange',
-      })
+      } else {
+        Toast("Inputs cannot be empty !", "error")
+      }
+    } catch (error) {
+      dispatch(setSpinner(false))
+      Alert("Something went wrong !", "error")
     }
   }
 
   function loadScript(src) {
-    return new Promise((resolve) => {
-      const script = document.createElement("script");
-      script.src = src;
-      script.onload = () => {
-        resolve(true);
-      };
-      script.onerror = () => {
-        resolve(false);
-      };
-      document.body.appendChild(script);
-    });
+    try {
+      return new Promise((resolve) => {
+        const script = document.createElement("script");
+        script.src = src;
+        script.onload = () => {
+          resolve(true);
+        };
+        script.onerror = () => {
+          resolve(false);
+        };
+        document.body.appendChild(script);
+      });
+    } catch (error) {
+      Alert("Something went wrong !", "error");
+    }
   }
 
   async function displayRazorpay() {
-    const res = await loadScript(
-      "https://checkout.razorpay.com/v1/checkout.js"
-    );
-    if (!res) {
-      return (swall.fire({
-        title : "Razorpay SDK failed to load. Are you online?",
-        icon : "error"
-      }).then(() => {}))
+    try {
+      dispatch(setSpinner(true))
+      const res = await loadScript(
+        "https://checkout.razorpay.com/v1/checkout.js"
+      );
+      if (!res) {
+        return (
+          Alert("Razorpay SDK failed to load. Are you online?", "error", "cancelBtn", "confirmBtn").then(() => {
+            dispatch(setSpinner(false))
+            return
+          }))
+      }
+
+      const arr = selectedSchedules.map(ele => ele._id);
+
+      // creating a new order
+      const result = await instance.post(BASEURL + "/payment/orders", { data: arr });
+      dispatch(setSpinner(false))
+      if (!result) {
+        return (
+
+          Toast("Server error. Are you online ? ", "error").then(() => {
+            dispatch(setSpinner(false))
+            return
+          }))
+      }
+      dispatch(setSpinner(false))
+
+
+      // Getting the order details back
+
+      const { amount, id: order_id, currency } = result.data.order;
+      const idArr = result.data.idArr;
+
+      const options = {
+        key: "rzp_test_GdkuntxOlaolUC", // Enter the Key ID generated from the Dashboard
+        amount: amount.toString(),
+        currency: currency,
+        name: `${user?.firstname} ${user?.lastname}`,
+        description: "Test Transaction",
+        // image: { logo },
+        order_id: order_id,
+        handler: async function (response) {
+          const data = {
+            orderCreationId: order_id,
+            razorpayPaymentId: response.razorpay_payment_id,
+            razorpayOrderId: response.razorpay_order_id,
+            razorpaySignature: response.razorpay_signature,
+          };
+          dispatch(setSpinner(true))
+          instance.post(BASEURL + "/payment/success", { data, idArr }).then(res => {
+            dispatch(setSpinner(false))
+            Alert("Booking is Success", "success").then(() => {
+              getSlotData()
+            })
+
+          }).catch(err => {
+            dispatch(setSpinner(false))
+            Alert("Something went wrong !", "error").then(() => {
+              getSlotData()
+            })
+          })
+
+        },
+        prefill: {
+          name: `${user.firstname} ${user.lastname}`,
+          email: user.email,
+          contact: "9999999999",
+        },
+        notes: {
+          address: "Soumya Dey Corporate Office",
+        },
+        theme: {
+          color: "#61dafb",
+        },
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+    } catch (error) {
+      Alert("Something went wrong !", "error");
+      dispatch(setSpinner(false))
     }
-    
-    const arr = selectedSchedules.map(ele =>  ele._id);
-   
-    // creating a new order
-    const result = await instance.post(BASEURL + "/payment/orders", { data: arr });
-
-    if (!result) {
-      return (swall.fire({
-        title : "Server error. Are you online ? ",
-        icon : "error",
-      }).then(() => {return}))
-    } 
-
-    // Getting the order details back
-  
-    const { amount, id: order_id, currency } = result.data.order;
-    const idArr = result.data.idArr;
-
-    const options = {
-      key: "rzp_test_GdkuntxOlaolUC", // Enter the Key ID generated from the Dashboard
-      amount: amount.toString(),
-      currency: currency,
-      name: `${user?.firstname} ${user?.lastname}`,
-      description: "Test Transaction",
-      // image: { logo },
-      order_id: order_id,
-      handler: async function (response) {
-        const data = {
-          orderCreationId: order_id,
-          razorpayPaymentId: response.razorpay_payment_id,
-          razorpayOrderId: response.razorpay_order_id,
-          razorpaySignature: response.razorpay_signature,
-        };
-
-        instance.post(BASEURL + "/payment/success", { data , idArr }).then(res => {
-          swall.fire({
-            title : "Booking is Success",
-            icon : "success"
-          }).then(() => {
-            getSlotData()
-          })
-
-        }).catch(err => {
-          swall.fire({
-            title : "Something went wrong !",
-            icon : "error"
-          }).then(() => {
-            getSlotData()
-          })
-        })
-        
-      },
-      prefill: {
-        name: `${user.firstname} ${user.lastname}`,
-        email: user.email,
-        contact: "9999999999",
-      },
-      notes: {
-        address: "Soumya Dey Corporate Office",
-      },
-      theme: {
-        color: "#61dafb",
-      },
-    };
-
-    const paymentObject = new window.Razorpay(options);
-    paymentObject.open();
   }
   const handleSchedules = (i) => {
-    setSelectedSchedules([...selectedSchedules, slot[i]]);
-    const arr = slot.filter(ele => ele !== slot[i]);
-    setSlot(arr);
+    try {
+      setSelectedSchedules([...selectedSchedules, slot[i]]);
+      const arr = slot.filter(ele => ele !== slot[i]);
+      setSlot(arr);
+    } catch (error) {
+      Alert("Something went wrong !", "error");
+    }
   };
   const handleSlot = (i) => {
+    try {
     setSlot([selectedSchedules[i], ...slot]);
     const arr = selectedSchedules.filter(ele => ele !== selectedSchedules[i]);
     setSelectedSchedules(arr);
+  } catch (error) {
+    Alert("Something went wrong !", "error");
+  }
   }
   const book = () => {
-    swall.fire({
-      title: "Do you want to book this schedules ?",
-      icon: "question",
-      showCancelButton: true
-    }).then((res) => {
+    try {
+    Alert("Do you want to book this timing ?", "question", "cancelBtn").then((res) => {
       if (res.isConfirmed) {
         displayRazorpay();
       }
       getSlotData();
       setSelectedSchedules([]);
-    })
+    })    
+  } catch (error) {
+    Alert("Something went wrong !", "error");
   }
+  }
+  // dispatch(setSpinner(false))
+
   return (
     <>
       <NavBar />
@@ -260,7 +319,7 @@ const OpenCourt = () => {
             <div className="p-4 w-[50%]">
               {slot.length > 0 ? <h1 className="text-center font-bold text-2xl p-2 ">Select Schedule</h1> : <h1 className="text-center font-bold text-2xl p-2 ">No Schedules Available</h1>}
               {slot.map((ele, i) => (
-                <button key={i} className={`border rounded m-1 p-2 ${ele.bookedBy ? `border-blue-300 text-blue-300 transition-all ` : `border-orange-600 text-orange-600 `} `} onMouseOver={ ele.bookedBy && ((e) => e.target.innerHTML = "already booked")} onMouseLeave={ele.bookedBy && ((e) => e.target.innerHTML = ele.slot.time)} onClick={() => { !ele.bookedBy && handleSchedules(i)}}>{ele.slot.time}</button>
+                <button key={i} className={`border rounded m-1 p-2 ${ele.bookedBy ? `border-blue-300 text-blue-300 transition-all ` : `border-orange-600 text-orange-600 `} `} onMouseOver={ele.bookedBy && ((e) => e.target.innerHTML = "already booked")} onMouseLeave={ele.bookedBy && ((e) => e.target.innerHTML = ele.slot.time)} onClick={() => { !ele.bookedBy && handleSchedules(i) }}>{ele.slot.time}</button>
               ))}
             </div>
             <div className="p-4 w-[50%]">

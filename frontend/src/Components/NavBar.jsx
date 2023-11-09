@@ -285,7 +285,7 @@ export function NavBar() {
   }, []);
 
   return (
-    <nav className="bg-white  sticky z-50 top-0 ">
+    <nav className="bg-white  sticky z-40 top-0 ">
       <Navbar className="mx-auto shadow-none border-none   bg-white p-2 lg:rounded lg:pl-6">
         <div className="relative mx-auto flex items-center text-gray-900">
           <Typography

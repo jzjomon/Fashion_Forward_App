@@ -12,6 +12,9 @@ import AlertModal from "./AlertModal.jsx";
 import { useNavigate } from "react-router-dom";
 import { instance } from "../config/axios.js";
 import Swal from "sweetalert2";
+import { Alert } from "../Constants/sweetAlert.js";
+import { useDispatch } from "react-redux";
+import { setSpinner } from "../toolkit/spinnerSlice.js";
 
 
 export function RegisterForm() {
@@ -24,7 +27,9 @@ export function RegisterForm() {
         location: "",
         about: "",
     })
+    const dispatch = useDispatch();
     const handleClick = (e) => {
+        try {
         e.preventDefault();
         const image = new FormData();
         image.append('img', img);
@@ -33,6 +38,7 @@ export function RegisterForm() {
             setAlertMessage("Please fill the registration form")
             setOpen(true)
         } else {
+            dispatch(setSpinner(true))
             instance.post('/vendor/register-court', image, { params: registerData }).then(res => {
                 Swal.fire({
                     title: "successfully registered",
@@ -41,6 +47,7 @@ export function RegisterForm() {
                     iconColor: "orange",
                     showConfirmButton : false
                 }).then(() => {
+                    dispatch(setSpinner(false))
                     setRegisterData({
                         courtName : "",
                         location : "",
@@ -50,10 +57,16 @@ export function RegisterForm() {
                     navigate('/courtRegister');
                 })
             }).catch(err => {
+                dispatch(setSpinner(false))
                 setAlertMessage("something went wrong");
                 setOpen(true)
             })
         }
+                    
+    } catch (error) {
+        dispatch(setSpinner(false))
+           Alert("Something went wrong !", "error") 
+    }
     }
     return (
         <div className="flex items-center justify-center  mt-10 ">

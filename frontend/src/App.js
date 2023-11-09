@@ -7,11 +7,17 @@ import MyCourts from './Pages/MyCourts';
 import { useSelector } from 'react-redux';
 import OpenCourt from './Pages/OpenCourt';
 import FourNotFour from './Pages/404';
+import { Spinner } from '@material-tailwind/react';
 
 function App() {
   const auth = useSelector((state) => state.user.user);
+  const { spinner } = useSelector(state => state.spinner);
+
   return (
     <>
+      {spinner && <div className='fixed top-0 right-0 left-0 w-full bg-blue-gray-300 h-[100vh] flex justify-center items-center z-50'>
+        <Spinner className='h-16 w-16' color='orange' />
+      </div>}
       <Routes>
         <Route path='*' element={<FourNotFour />} />
         <Route path='/' element={auth ? <Home /> : <Login />} />
