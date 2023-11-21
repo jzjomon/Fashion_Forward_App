@@ -3,8 +3,11 @@ import Button from "./Button"
 import { validateEmail, validateFirstName, validateLastName, validatePass } from "../Constants/Rejex";
 import AlertModal from "./AlertModal";
 import axios from 'axios';
+import { useDispatch } from "react-redux";
+import { setSpinner } from "../toolkit/spinnerSlice";
 
 const SignUpCard = ({ setLogin }) => {
+    const dispatch = useDispatch();
     const [fnameAlert, setFnameAlert] = useState(false);
     const [lnameAlert, setLnameAlert] = useState(false);
     const [emailAlert, setEmailAlert] = useState(false);
@@ -23,51 +26,61 @@ const SignUpCard = ({ setLogin }) => {
         }, 900);
     }
     const handleClick = () => {
-        if (!details.firstname && !details.lastname && !details.email && !details.password) {
-            setAlertMessage('Inputs cannot be empty !')
-            setOpen(true);
-        }else  if(!details.firstname || !details.lastname || !details.email || !details.password){
-            setOpen(true);
-        } else {
-            if (!validateFirstName.test(details.firstname)) {
-                setFnameAlert(true);
-                setTimeout(() => {
-                    setFnameAlert(false)
-                }, 3000);
-            } else if (!validateLastName.test(details.lastname)) {
-                setLnameAlert(true);
-                setTimeout(() => {
-                    setLnameAlert(false)
-                }, 3000);
-            } else if (!validateEmail.test(details.email)) {
-                setEmailAlert(true);
-                setTimeout(() => {
-                    setEmailAlert(false)
-                }, 3000);
-            } else if (!validatePass.test(details.password)) {
-                setPassAlert(true);
-                setTimeout(() => {
-                    setPassAlert(false)
-                }, 3000);
-            } else if (details.password !== rePass) {
-                setRePassAlert(true)
-                setTimeout(() => {
-                    setRePassAlert(false)
-                }, 3000);
+        try {
+            if (!details.firstname && !details.lastname && !details.email && !details.password) {
+                setAlertMessage('Inputs cannot be empty !')
+                setOpen(true);
+            }else  if(!details.firstname || !details.lastname || !details.email || !details.password){
+                setOpen(true);
             } else {
-                 axios.post('http://localhost:8080/signup',details).then(res => {
-                        setLogin(true)
-                 }).catch(err => {
-                  if(err?.response?.data?.exist){
-                     setAlertMessage('Email already exists !');
-                     setOpen(true)
-                  }else{
-                    setAlertMessage('Something went wrong !');
-                    setOpen(true)
-                  }
-                 })
+                if (!validateFirstName.test(details.firstname)) {
+                    setFnameAlert(true);
+                    setTimeout(() => {
+                        setFnameAlert(false)
+                    }, 3000);
+                } else if (!validateLastName.test(details.lastname)) {
+                    setLnameAlert(true);
+                    setTimeout(() => {
+                        setLnameAlert(false)
+                    }, 3000);
+                } else if (!validateEmail.test(details.email)) {
+                    setEmailAlert(true);
+                    setTimeout(() => {
+                        setEmailAlert(false)
+                    }, 3000);
+                } else if (!validatePass.test(details.password)) {
+                    setPassAlert(true);
+                    setTimeout(() => {
+                        setPassAlert(false)
+                    }, 3000);
+                } else if (details.password !== rePass) {
+                    setRePassAlert(true)
+                    setTimeout(() => {
+                        setRePassAlert(false)
+                    }, 3000);
+                } else {
+                    dispatch(setSpinner(true));
+                     axios.post('http://localhost:8080/signup',details).then(res => {
+                        dispatch(setSpinner(false));
+                            setLogin(true)
+                     }).catch(err => {
+                        dispatch(setSpinner(false));
+                      if(err?.response?.data?.exist){
+                         setAlertMessage('Email already exists !');
+                         setOpen(true)
+                      }else{
+                        setAlertMessage('Something went wrong !');
+                        setOpen(true)
+                      }
+                     })
+                }
             }
+        } catch (error) {
+            dispatch(setSpinner(false));
+            setAlertMessage('Something went wrong !');
+            setOpen(true)
         }
+       
     }
 
     return (

@@ -5,7 +5,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from "react-redux";
 import { setUserLogin } from "../toolkit/userSlice";
-// import swal from 'sweetalert2'
+import { BASEURL } from "../Constants/baseUrl";
+import { setSpinner } from "../toolkit/spinnerSlice";
 
 const LoginCard = ({ setLogin }) => {
     const dispatch = useDispatch();
@@ -27,11 +28,14 @@ const LoginCard = ({ setLogin }) => {
     const handleClick = () => {
         try {
             if (details.email && details.password) {
+                dispatch(setSpinner(true));
                 axios.post('http://localhost:8080/login', details).then(({ data }) => {
+                    dispatch(setSpinner(false));
                     dispatch(setUserLogin({ user: data?.data }));
                     localStorage.setItem('token', data?.token);
                     navigate('/home')
                 }).catch((({ response: { data } }) => {
+                    dispatch(setSpinner(false));
                     if (data?.exist) {
                         setAlertMessage('Invalid email !')
                         setOpen(true);
@@ -44,15 +48,33 @@ const LoginCard = ({ setLogin }) => {
                     }
                 }))
             } else {
+                dispatch(setSpinner(false));
                 setAlertMessage('Inputs cannot be empty !');
                 setOpen(true)
             }
         }
         catch (error) {
+            dispatch(setSpinner(false));
             setAlertMessage('Something went wrong !');
             setOpen(true);
         }
-
+    }
+    const handleOtp = () => {
+        try {
+            dispatch(setSpinner(true))
+            axios.post(BASEURL + '/getOtp', { email: details.email }).then(res => {
+                dispatch(setSpinner(false));
+                navigate(`/getOtp/${details.email}`);
+            }).catch(res => {
+                dispatch(setSpinner(false));
+                setAlertMessage("Something went wrong !");
+                setOpen(true);
+            })
+        } catch (error) {
+            dispatch(setSpinner(false));
+            setAlertMessage("Something went wrong !");
+            setOpen(true);
+        }
     }
     return (
         <>
@@ -95,7 +117,8 @@ const LoginCard = ({ setLogin }) => {
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                         </svg>
                     </div>
-                    <h2 className="font-mono font-medium my-3" >{alertMessage}</h2>
+                    <h2 className="font-mono font-medium my-3 text-xl" >{alertMessage}</h2>
+                    {alertMessage === "invalid password !" && <span onClick={handleOtp} className="text-sm font-semibold text-blue-800 cursor-pointer">forgot password ?</span>}
                     <div className="text-center mt-1 " onClick={() => setOpen(false)}>
                         <button className="border px-2 py-1 bg-orange-500 text-white rounded-md hover:bg-white hover:text-orange-500 hover:border-orange-500 transition-all  ">Ok</button>
                     </div>

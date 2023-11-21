@@ -1,6 +1,9 @@
 const USER = require('../models/userModal');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const otpGenerator = require('otp-generator');
+const transporter = require('../helppers/nodemailer.js');
+const OTP = require('../models/otpModal.js');
 
 const signUp = (req, res) => {
     try {
@@ -20,7 +23,7 @@ const signUp = (req, res) => {
                     }
                 }).catch((err) => {
                     res.status(500).json({ error: true })
-                });
+                }); 
             }
         })
     }
@@ -48,9 +51,65 @@ const login =  (req, res) => {
         })
     }
     catch (err) {
-        res.status(500).json({ error: true });
+        res.status(500).json({ error: true });     
+    }
+}
+const getOtp = (req, res) => {
+    try {
+        const email = req.body.email;
+       const otp = otpGenerator.generate(4);
+       OTP({otp : otp, email}).save().then( async response => {
+           await transporter.sendMail({
+            from: "turfhouse", // sender address
+            to: email, // list of receivers
+            subject: "Password reset", // Subject line
+            html : `<span><span style="font-weight : bold;">${otp} </span> this is your OTP.  OTP is valid for 10 mins.</span>`
+           })
+           res.status(200).json({message : "OTP Send"});
+           setTimeout(() => {
+            OTP.deleteOne({email}).then(res => {
+                console.log(res);
+            }).catch(err => {
+                console.log(err);
+            })
+           }, 600000);
+       }).catch(err => {
+        res.status(401).json({message : "Something went wrong !"})
+       })
+
+    } catch (error) {
+        res.status(500).json({ message : "Something went wrong !"});
     }
 }
 
+const tryOtp = (req, res) => {
+    try {
+        OTP.findOne({email : req.body.email, otp : req.body.otp}).then(response => {
+            res.status(200).json({ message : "reset password"})
+        }).catch(err => {
+            res.status(400).json({message : "otp not valid !"})
+        })
+    } catch (error) {
+        res.status(500).json({message : "Something went wrong !"});
+    }
+}
  
-module.exports = { signUp, login }
+const resetPass = (req,res) => {
+    try {
+        bcrypt.hash(req.body.pass, 10, (err, hash) => {
+           if (err) {
+            res.status(400).json({message : "Something went wrong !"});
+           } else {
+            USER.findOneAndUpdate({email : req.body.email},{ password : hash }).then(response => {
+                res.status(200).json({message : "Password reseted successfully"});
+            }).catch(err => {
+                res.status(401).json({message : "Something went wrong !"});
+            })
+           }
+        })
+    } catch (error) {
+        res.status(500).json({message : "Something went wrong !"});
+    }
+}
+
+module.exports = { signUp, login, getOtp, tryOtp, resetPass }

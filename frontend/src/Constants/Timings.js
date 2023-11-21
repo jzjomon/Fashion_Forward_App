@@ -56,7 +56,7 @@ export const TIMINGS = [
         id : 13
     },
     {
-        time : '2pm-3am',
+        time : '2pm-3pm',
         id : 14
     },
     {

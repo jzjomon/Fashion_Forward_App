@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -13,6 +13,7 @@ import {
   // Card,
   IconButton,
   Collapse,
+  // Input,
 } from "@material-tailwind/react";
 import {
   CubeTransparentIcon,
@@ -27,10 +28,12 @@ import {
   // PowerIcon,
   // RocketLaunchIcon,
   Bars2Icon,
-  ChatBubbleLeftRightIcon,
+  // ChatBubbleLeftRightIcon,
   HomeIcon,
 } from "@heroicons/react/24/outline";
 import { setUserLogin } from "../toolkit/userSlice";
+import Search from "./Search";
+import { setSearchInput } from "../toolkit/searchSlice";
 
 // // profile menu component
 // const profileMenuItems = [
@@ -69,6 +72,8 @@ function ProfileMenu() {
       navigate("/courtRegister")
     } else if (param === "myCourts") {
       navigate(`/myCourts/${user._id}`)
+    } else if (param === 'myBookings') {
+      navigate(`/myBookings/${user._id}`)
     }
     setIsMenuOpen(false);
   }
@@ -96,6 +101,7 @@ function ProfileMenu() {
         </Button>
       </MenuHandler>
       <MenuList className="p-1">
+        
         {user.role === 2 | user.role === 3 && (<><MenuItem onClick={() => closeMenu("registerCourt")} className="flex items-center gap-2 rounded">
           <Typography as='span' variant="small" className="font-normal">
             Register Court
@@ -108,6 +114,12 @@ function ProfileMenu() {
           </MenuItem>
         </>
         )}
+       
+        <MenuItem onClick={() => closeMenu("myBookings")} className="flex items-center gap-2 rounded">
+          <Typography as='span' variant="small" className="font-normal">
+            My Bookings
+          </Typography>
+        </MenuItem>
         <MenuItem onClick={() => closeMenu("signOut")} className="flex items-center gap-2 rounded">
           <Typography as='span' variant="small" className="font-normal text-red-600 ">
             Sign Out
@@ -234,10 +246,10 @@ const navListItems = [
     label: "About Us",
     icon: UserGroupIcon,
   },
-  {
-    label: "Reach Us",
-    icon: ChatBubbleLeftRightIcon,
-  },
+  // {
+  //   label: "Reach Us",
+  //   icon: ChatBubbleLeftRightIcon,
+  // },
 ];
 
 function NavList() {
@@ -269,6 +281,7 @@ function NavList() {
           </MenuItem>
         </Typography>
       ))}
+        <Search/>
     </ul>
   );
 }
@@ -286,7 +299,7 @@ export function NavBar() {
   }, []);
 
   return (
-    <nav className="bg-white  sticky z-40 top-0 ">
+    <nav className="bg-white  sticky z-30 top-0 ">
       <Navbar className="mx-auto shadow-none border-none   bg-white p-2 lg:rounded lg:pl-6">
         <div className="relative mx-auto flex items-center text-gray-900">
           <Typography
@@ -313,6 +326,7 @@ export function NavBar() {
         <Collapse open={isNavOpen} className="overflow-scroll">
           <NavList />
         </Collapse>
+
       </Navbar>
     </nav>
   );

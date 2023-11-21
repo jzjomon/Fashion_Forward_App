@@ -1,7 +1,7 @@
 const COURT_SCHEDULES = require('../models/courtScheduleModal.js');
 const Razorpay = require('razorpay');
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
+const transporter = require('../helppers/nodemailer.js')
 
 
 
@@ -9,15 +9,6 @@ const nodemailer = require("nodemailer");
 const initiateEmail = async (id, razorpayPaymentId) => {
     const slotData = await COURT_SCHEDULES.findOne({ _id: id }).populate("bookedBy").populate("courtId");
     const { date, slot, rate, bookedBy, courtId} = slotData;
-
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            // TODO: replace `user` and `pass` values from <https://forwardemail.net>
-            user: process.env.EMAIL_ID,
-            pass: process.env.EMAIL_PASS,
-        },
-    });
 
     const info = await transporter.sendMail({
         from: "turfhouse", // sender address

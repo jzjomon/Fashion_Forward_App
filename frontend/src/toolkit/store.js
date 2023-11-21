@@ -1,6 +1,7 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import userReducer from './userSlice.js'
-import spinnerReducer from "./spinnerSlice.js"
+import userReducer from './userSlice.js';
+import spinnerReducer from "./spinnerSlice.js";
+import searchReducer from "./searchSlice.js";
 import  storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
 import thunk from 'redux-thunk'
@@ -12,7 +13,8 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
     user: userReducer,
-    spinner : spinnerReducer
+    spinner : spinnerReducer,
+    search : searchReducer,
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

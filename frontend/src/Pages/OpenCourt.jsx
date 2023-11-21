@@ -10,6 +10,7 @@ import { TIMINGS } from '../Constants/Timings.js';
 import { Alert, Toast } from "../Constants/sweetAlert.js";
 import { setUserLogin } from "../toolkit/userSlice.js";
 import { setSpinner } from "../toolkit/spinnerSlice.js";
+import CourtTimeTable from "./CourtTimeTable.jsx";
 
 const OpenCourt = () => {
   const { id } = useParams();
@@ -330,6 +331,9 @@ const OpenCourt = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div className="px-3">
+        {user?.role === 2 && user?._id === data?.userId && <CourtTimeTable courtId={id} />}
       </div>
       <AlertModal open={open} onClose={() => setOpen(false)}>
         <div className="md:flex justify-between ">
