@@ -1,8 +1,9 @@
 import axios from 'axios';
-import { BASEURL } from '../Constants/baseUrl';
+const baseURL = process.env.REACT_APP_BASEURL;
 
 export const instance = axios.create({
-    baseURL: BASEURL
+    baseURL,
+    // timeout : 5000
 })
 
 
@@ -16,5 +17,5 @@ instance.interceptors.request.use(config => {
 instance.interceptors.response.use((response) => {
     return response;
 }, ({ response: { data: { auth } } }) => {
-    if (!auth) return Promise.reject( localStorage.clear() )
+    if (!auth) return Promise.reject(localStorage.clear())
 })

@@ -20,7 +20,8 @@ const userSchema = mongoose.Schema({
     role : {
         type: Number,
         default: 1
-    }
+    },
+    img : String
 })
 
 const userModal = mongoose.model('users',userSchema);

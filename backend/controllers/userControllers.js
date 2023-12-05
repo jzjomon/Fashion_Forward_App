@@ -1,6 +1,9 @@
 const COURT = require('../models/courtModal.js');
 const COURT_SCHEDULES = require('../models/courtScheduleModal.js');
 const ObjectId = require('mongoose').Types.ObjectId;
+const path = require('path');
+const USER = require('../models/userModal.js');
+const fs = require('fs');
 
 
 const getCourts = (req, res) => {
@@ -170,4 +173,73 @@ const getBookedData = (req, res) => {
     }
 }
 
-module.exports = { getCourts, myCourts, getCourt, getSlots, getBookedData } 
+const setProfilePic = (req, res) => {
+    try {
+        const file = req.files.img;
+        const imageName = `${Date.now()}-${file.name}`;
+        const filePath = path.join(__dirname, '../public/images', imageName);
+        USER.findOne({ _id: req.userId }).then(result => {
+            if (result.img) {
+                const filePathOld = path.join(__dirname, '../public/images', result.img);
+                fs.unlink(filePathOld, (err) => {
+                    if (err) {
+                        res.status(400).json({message : "Cannot find the old img"});
+                    } else {
+                        file.mv(filePath, (err) => {
+                            if (err) {
+                                res.status(400).json({message : "cannot save the image in server"});
+                            } else {
+                                USER.findOneAndUpdate({_id : req.userId}, {img : imageName},{new : true}).then((result) => {
+                                    result.password = null;
+                                    res.status(200).json({message : "Successfully updated", data : result});
+                                }).catch((err) => {
+                                    res.status(400).json({message : "Cannot save in database"});
+                                });
+                            }
+                        })
+                    }
+                })
+            } else {
+                file.mv(filePath, (err) => {
+                    if (err) {
+                        res.status(400).json({message : "cannot save the image"});
+                    } else {
+                        USER.findOneAndUpdate({_id : req.userId}, {img : imageName}, {new : true}).then((result) => {
+                            result.password = null;
+                            res.status(200).json({message : "Successfully updated", data : result});
+                        }).catch((err) => {
+                            res.status(400).json({message : "Cannot save in database"});
+                        });
+                    }
+                })
+            }
+        }).catch(err => {
+            res.status(400).json({message : "Cannot find this person"});
+        })
+
+    } catch (error) {
+        res.status(500).json({ message: "Something went wrong !" });
+    }
+}
+
+const deletePic = (req, res) => {
+    try {
+        USER.findOneAndUpdate({_id : req.userId},{img : null}).then((result) => {
+            const filePath = path.join(__dirname,"../public/images",result.img);
+            fs.unlink(filePath, (err) => {
+                if(err) {
+                    res.status(400).json({message : "cannot delete the file"})
+                } else {
+                    result.img = null;
+                    res.status(200).json({message : "successfully deleted",data : result})
+                }
+            })
+        }).catch((err) => {
+            res.status(400).json({message : "cannot find the person"})
+        });
+    } catch (error) {
+        res.status(500).json({message : "Something went wrong !"})
+    }
+}
+
+module.exports = { getCourts, myCourts, getCourt, getSlots, getBookedData, setProfilePic, deletePic }
