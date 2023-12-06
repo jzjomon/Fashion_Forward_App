@@ -21,7 +21,19 @@ const userSchema = mongoose.Schema({
         type: Number,
         default: 1
     },
-    img : String
+    img : String,
+    phone : {
+        type : String,
+        default : null
+    },
+    designation :{
+        type : String,
+        default : null
+    },
+    address : {
+        type : String,
+        default : null
+    }
 })
 
 const userModal = mongoose.model('users',userSchema);
